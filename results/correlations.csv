@@ -1,0 +1,4 @@
+indicator,spearman_rho_with_gdp_per_capita,p_value,n
+Renewable electricity output (% of electricity),-0.1674,0.0187,197
+"Renewable energy (% of final energy, World Bank)",-0.5627,0.0000,196
+"Renewable energy (% of final energy, UN SDG 7.2.1)",-0.5642,0.0000,197

@@ -1,0 +1,34 @@
+{
+  "trend_years": [
+    2000,
+    2021
+  ],
+  "median_all_reporting": [
+    13.888512821614,
+    22.8074034074034
+  ],
+  "median_balanced_panel": [
+    10.2941176470588,
+    21.9775686385508
+  ],
+  "balanced_panel_countries": 187,
+  "population_weighted_mean": [
+    23.95412890682968,
+    30.126533625728516
+  ],
+  "share_of_countries_increasing_2011_2021": 0.7350993377483444,
+  "median_change_2011_2021_pp": 4.58928937838693,
+  "countries_in_change_analysis": 151,
+  "un_sdg_7_2_1": {
+    "year": 2023,
+    "countries": 225,
+    "median": 18.32,
+    "mean": 27.333422222222225,
+    "values_in_2024": 84
+  },
+  "correlations": {
+    "Renewable electricity output (% of electricity)": -0.1673911107047674,
+    "Renewable energy (% of final energy, World Bank)": -0.5626678240553784,
+    "Renewable energy (% of final energy, UN SDG 7.2.1)": -0.5642246925414434
+  }
+}

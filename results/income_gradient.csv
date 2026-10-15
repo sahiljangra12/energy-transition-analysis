@@ -1,0 +1,5 @@
+gdp_quartile,countries,median_gdp_per_capita_usd,median_renewable_electricity_pct,median_renewable_final_energy_pct
+Q1 (poorest),50,1201.2890,44.0185,64.8500
+Q2,49,4287.1731,24.4634,18.9000
+Q3,49,12748.1701,19.1545,12.5000
+Q4 (richest),49,43725.1000,22.8074,11.7000

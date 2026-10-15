@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "energy-transition"
+version = "1.0.0"
+description = "Renewable energy and development across countries: World Bank and UN SDG 7.2.1, 2000–2021"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Sahil" }]
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=2.0",
+  "numpy>=1.24",
+  "scipy>=1.10",
+  "matplotlib>=3.8",
+  "pycountry>=23.12",
+]
+
+[project.optional-dependencies]
+app = ["streamlit>=1.46", "plotly>=5.0"]
+dev = ["pytest>=7", "ruff>=0.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.setuptools.package-data]
+energy_transition = ["dashboard_template.html"]
