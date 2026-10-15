@@ -1,40 +1,77 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
 <title>Energy Transition Explorer</title>
 <script src="__PLOTLY__"></script>
 <style>
-:root{--bg:#fcfcfb;--panel:#ffffff;--ink:#0b0b0b;--ink2:#52514e;--line:#e4e3df;--accent:#1b8a6b}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1a17;--panel:#16241f;--ink:#eef4f1;--ink2:#a9bcb6;--line:#2c4740;--accent:#3fc59a}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif}
-.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
-.kicker{color:var(--accent);font-weight:600;font-size:12px;letter-spacing:1.2px;text-transform:uppercase}
-h1{margin:6px 0 4px;font-size:28px}p.sub{color:var(--ink2);margin:0 0 20px;max-width:760px;line-height:1.5}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.kpi b{display:block;font-size:24px;margin-bottom:2px}.kpi span{color:var(--ink2);font-size:13px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 12px 4px;margin-bottom:16px}
-.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:4px 6px 0;color:var(--ink2);font-size:14px}
-select,input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px 8px}
-input[type=range]{width:240px;padding:0}
-footer{color:var(--ink2);font-size:13px;line-height:1.6}footer a{color:var(--accent)}
+:root{--bg:#f6f6f4;--panel:#ffffff;--ink:#141413;--ink2:#5a5955;--line:#e6e5e1;--accent:#1b8a6b;--blue:#2a78d6;--orange:#eb6834}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.5}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 16px 48px}
+.kicker{color:var(--accent);font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase}
+h1{margin:6px 0 6px;font-size:30px;line-height:1.2}
+p.sub{color:var(--ink2);margin:0 0 22px;max-width:760px;font-size:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.kpi b{display:block;font-size:26px;margin-bottom:4px}.kpi span{color:var(--ink2);font-size:13.5px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 20px 10px;margin-bottom:20px}
+.panel h2{margin:0 0 4px;font-size:19px}
+.panel p.how{margin:0 0 12px;color:var(--ink2);font-size:14px;max-width:800px}
+.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 6px;color:var(--ink2);font-size:14px}
+.controls b{color:var(--ink);font-size:18px;min-width:44px}
+select{font:inherit;color:var(--ink);background:var(--panel);border:1px solid #cfcdc7;border-radius:8px;padding:6px 10px}
+input[type=range]{width:min(320px,60vw);accent-color:var(--accent)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin:2px 0 6px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px;border:1px solid #d5d4cf}
+.takeaway{background:#f1f7f4;border-left:3px solid var(--accent);padding:10px 14px;border-radius:6px;font-size:14px;margin:6px 0 10px}
+ul.find{margin:6px 0 0;padding-left:20px}ul.find li{margin-bottom:6px}
+footer{color:var(--ink2);font-size:13px;line-height:1.7}footer a,.panel a{color:var(--accent)}
+@media print{body{background:#fff}.panel,.kpi{break-inside:avoid}}
 </style></head><body><div class="wrap">
 <div class="kicker">Sahil · Energy transition analysis</div>
 <h1>Renewable energy and development, 2000–2021</h1>
-<p class="sub">How renewable electricity has grown across countries, and how renewable energy relates to income. Data: World Bank Indicators and UN SDG 7.2.1. Descriptive analysis, not causal.</p>
+<p class="sub">How much of each country's energy comes from renewable sources (hydro, wind, solar, bioenergy), how that has changed since 2000, and how it relates to national income. Data for 215 countries and areas from the World Bank and the UN SDG database.</p>
+
 <div class="kpis" id="kpis"></div>
-<div class="panel"><div class="controls">Year <input type="range" id="year"><b id="yearLabel"></b></div><div id="map" style="height:470px"></div></div>
-<div class="panel"><div class="controls">Show
-<select id="measure"><option value="elec">Renewable share of electricity</option><option value="final">Renewable share of all final energy</option></select></div>
-<div id="scatter" style="height:440px"></div></div>
-<footer>Sources: <a href="https://data.worldbank.org/indicator/EG.ELC.RNEW.ZS">World Bank EG.ELC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS">EG.FEC.RNEW.ZS</a>, <a href="https://unstats.un.org/sdgs/dataportal/database">UN SDG database</a>.
+
+<div class="panel">
+  <h2>1. Where does electricity come from renewables?</h2>
+  <p class="how">Each country is shaded by the share of its electricity generated from renewable sources. Darker blue means more renewable. Drag the slider to see any year from 2000 to 2021, and hover over a country for its exact value.</p>
+  <div class="controls">Year <input type="range" id="year" aria-label="Year"><b id="yearLabel"></b></div>
+  <div class="legend"><span><i class="sw" style="background:#eef4fc"></i>0–20%</span><span><i class="sw" style="background:#8fb8ea"></i>around 50%</span><span><i class="sw" style="background:#1d5aa6"></i>80–100%</span><span><i class="sw" style="background:#d9d8d3"></i>No data</span></div>
+  <div id="map" style="height:460px"></div>
+  <div class="takeaway">Countries with large rivers and hydropower (Brazil, Norway, much of Central and Southern Africa) are darkest. Slide back to 2000 and compare: Germany, the UK and Spain get noticeably darker by 2021 as wind and solar grow.</div>
+</div>
+
+<div class="panel">
+  <h2>2. Are richer countries more renewable?</h2>
+  <p class="how">Each dot is one country in 2021. Left to right is GDP per person (log scale, so each step is ten times richer). Bottom to top is the renewable share. Switch between the two measures to see why the answer depends on what you count.</p>
+  <div class="controls">Measure
+    <select id="measure" aria-label="Measure"><option value="final">Renewable share of all energy use</option><option value="elec">Renewable share of electricity only</option></select></div>
+  <div id="scatter" style="height:440px"></div>
+  <div class="takeaway" id="scatterNote"></div>
+</div>
+
+<div class="panel">
+  <h2>What this shows</h2>
+  <ul class="find">
+    <li><b>Renewable electricity doubled for the typical country</b>, from 10% to 22% among the 187 countries that reported every year.</li>
+    <li><b>Most countries moved up:</b> 74% of countries with over 1 million people raised their renewable electricity share between 2011 and 2021. Countries that started low gained the most.</li>
+    <li><b>Income is not the main driver of clean electricity.</b> Geography (rivers for hydropower) and policy matter more. The steep income pattern for all energy mostly reflects poorer households cooking with wood and charcoal.</li>
+  </ul>
+  <p class="how" style="margin-top:10px">These are descriptive patterns, not causal effects. Regression models, limitations and the full method are in the <a href="https://github.com/sahiljangra12/energy-transition-analysis/blob/main/docs/report.md">research note</a>.</p>
+</div>
+
+<footer>Sources: <a href="https://data.worldbank.org/indicator/EG.ELC.RNEW.ZS">World Bank EG.ELC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS">EG.FEC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD">NY.GDP.PCAP.CD</a>, <a href="https://unstats.un.org/sdgs/dataportal/database">UN SDG database (7.2.1)</a>.<br>
 Code and full method: <a href="https://github.com/sahiljangra12/energy-transition-analysis">github.com/sahiljangra12/energy-transition-analysis</a></footer>
 </div>
 <script>
 const D = __DATA__;
-const dark = matchMedia('(prefers-color-scheme: dark)').matches;
-const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const base = {paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', font:{color:css('--ink'), family:'-apple-system,Segoe UI,Helvetica,Arial,sans-serif'}, margin:{l:50,r:20,t:30,b:45}};
+const INK = '#141413', INK2 = '#5a5955', GRID = '#ecebe7', FONT = '-apple-system,Segoe UI,Helvetica,Arial,sans-serif';
+const base = {paper_bgcolor:'#ffffff', plot_bgcolor:'#ffffff', font:{color:INK, family:FONT, size:13}};
 const blues = [[0,'#eef4fc'],[0.25,'#c6dbf5'],[0.5,'#8fb8ea'],[0.75,'#4f8fdc'],[1,'#1d5aa6']];
+const cfg = {displayModeBar:false, responsive:true};
+const narrow = () => window.innerWidth < 640;
+document.getElementById('map').style.height = narrow() ? '340px' : '460px';
 
 document.getElementById('kpis').innerHTML = D.kpis.map(k => `<div class="kpi"><b>${k.value}</b><span>${k.label}</span></div>`).join('');
 
@@ -43,26 +80,39 @@ function drawMap(){
   const y = +yr.value; document.getElementById('yearLabel').textContent = y;
   const rows = D.map.filter(r => r.year === y);
   Plotly.react('map', [{type:'choropleth', locations:rows.map(r=>r.iso3), z:rows.map(r=>r.elec), text:rows.map(r=>r.name),
-    zmin:0, zmax:100, colorscale:blues, marker:{line:{color:dark?'#0f1a17':'#ffffff', width:0.4}},
-    colorbar:{title:{text:'% of electricity', side:'right'}, thickness:12, len:0.8, ticksuffix:'%'},
-    hovertemplate:'<b>%{text}</b><br>Renewable electricity: %{z:.1f}%<extra></extra>'}],
-    {...base, margin:{l:0,r:0,t:10,b:0}, geo:{projection:{type:'natural earth'}, showframe:false, bgcolor:'rgba(0,0,0,0)',
-      showcoastlines:false, landcolor:dark?'#2c4740':'#e4e3df', showland:true, showcountries:false}},
-    {displayModeBar:false, responsive:true});
+    zmin:0, zmax:100, colorscale:blues, marker:{line:{color:'#ffffff', width:0.5}},
+    colorbar: narrow()
+      ? {orientation:'h', x:0.5, xanchor:'center', y:-0.02, yanchor:'top', len:0.9, thickness:10,
+         title:{text:'Renewable share of electricity', side:'top', font:{size:12, color:INK2}},
+         tickvals:[0,25,50,75,100], ticksuffix:'%', tickfont:{color:INK2}, outlinewidth:0}
+      : {title:{text:'Renewable share<br>of electricity', font:{size:12, color:INK2}}, thickness:12, len:0.7,
+         tickvals:[0,25,50,75,100], ticksuffix:'%', tickfont:{color:INK2}, outlinewidth:0},
+    hovertemplate:'<b>%{text}</b><br>Renewable electricity in '+y+': %{z:.1f}%<extra></extra>'}],
+    {...base, margin:{l:0,r:0,t:0,b:narrow()?60:0},
+     geo:{projection:{type:'natural earth'}, showframe:false, bgcolor:'#ffffff', lataxis:{range:[-57,85]},
+      showcoastlines:false, showland:true, landcolor:'#d9d8d3', showcountries:true, countrycolor:'#ffffff',
+      showocean:false, showlakes:false}}, cfg);
 }
 yr.addEventListener('input', drawMap); drawMap();
 
+const notes = {
+  final: 'Strong downward pattern: the poorest countries get most of their energy from renewables, mainly wood and charcoal for cooking, not modern clean energy (Spearman ρ = __RHO_FINAL__).',
+  elec: 'Almost no pattern: rich countries range from near 0% (fossil-heavy) to near 100% (hydro-rich such as Norway). Income tells you little about clean electricity (ρ = __RHO_ELEC__).'
+};
 const ms = document.getElementById('measure');
 function drawScatter(){
-  const m = ms.value, key = m === 'elec' ? 'elec' : 'final';
-  const rows = D.scatter.filter(r => r[key] !== null);
+  const key = ms.value;
+  const rows = D.scatter.filter(r => r[key] !== null && r.gdp !== null);
+  const color = key === 'elec' ? '#2a78d6' : '#eb6834';
   Plotly.react('scatter', [{type:'scatter', mode:'markers', x:rows.map(r=>r.gdp), y:rows.map(r=>r[key]), text:rows.map(r=>r.name),
-    marker:{size:9, color:m==='elec'?'#2a78d6':'#eb6834', opacity:0.75, line:{color:dark?'#16241f':'#ffffff', width:1}},
-    hovertemplate:'<b>%{text}</b><br>GDP per capita: $%{x:,.0f}<br>Share: %{y:.1f}%<extra></extra>'}],
-    {...base, title:{text:(m==='elec'?'Renewable share of electricity':'Renewable share of all final energy')+' vs GDP per capita, 2021', x:0.01, font:{size:15}},
-     xaxis:{type:'log', title:'GDP per capita, US$ (log scale)', gridcolor:css('--line')},
-     yaxis:{title:'Share (%)', range:[-2,102], gridcolor:css('--line')}},
-    {displayModeBar:false, responsive:true});
+    marker:{size:9, color:color, opacity:0.75, line:{color:'#ffffff', width:1}},
+    hovertemplate:'<b>%{text}</b><br>GDP per person: $%{x:,.0f}<br>Renewable share: %{y:.1f}%<extra></extra>'}],
+    {...base, margin:{l:64,r:16,t:10,b:56}, showlegend:false,
+     xaxis:{type:'log', title:{text:'GDP per person, US$ (log scale)', font:{color:INK2}}, gridcolor:GRID, zeroline:false,
+       tickvals:[300,1000,3000,10000,30000,100000], ticktext:['$300','$1k','$3k','$10k','$30k','$100k'], tickfont:{color:INK2}},
+     yaxis:{title:{text:(key==='elec'?'Renewable share of electricity':'Renewable share of all energy')+' (%)', font:{color:INK2}},
+       range:[-3,103], gridcolor:GRID, zeroline:false, ticksuffix:'%', tickvals:[0,25,50,75,100], tickfont:{color:INK2}}}, cfg);
+  document.getElementById('scatterNote').textContent = notes[key];
 }
 ms.addEventListener('change', drawScatter); drawScatter();
 </script></body></html>
