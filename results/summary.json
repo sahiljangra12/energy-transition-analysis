@@ -30,5 +30,39 @@
     "Renewable electricity output (% of electricity)": -0.1673911107047674,
     "Renewable energy (% of final energy, World Bank)": -0.5626678240553784,
     "Renewable energy (% of final energy, UN SDG 7.2.1)": -0.5642246925414434
+  },
+  "models": {
+    "cross_section_log_gdp": {
+      "Electricity share, 2021": {
+        "coef": -6.610871394317839,
+        "p_value": 0.002088554823688764,
+        "n": 197
+      },
+      "Final-energy share, 2021": {
+        "coef": -9.179531590327759,
+        "p_value": 4.4314853790229584e-10,
+        "n": 205
+      }
+    },
+    "cross_section_r_squared": {
+      "Electricity share, 2021": 0.15263948263487703,
+      "Final-energy share, 2021": 0.49423059916252454
+    },
+    "convergence_start_share": {
+      "coef": -0.11003186141443479,
+      "p_value": 0.00038650816113679367,
+      "n": 149
+    },
+    "convergence_log_gdp": {
+      "coef": -0.11214528467178925,
+      "p_value": 0.8963913728916526,
+      "n": 149
+    },
+    "convergence_r_squared": 0.2475141145421178,
+    "within_country_log_gdp": {
+      "coef": -2.460582909358667,
+      "p_value": 0.11343674985715198,
+      "n": 4312
+    }
   }
 }

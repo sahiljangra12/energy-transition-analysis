@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "energy-transition"
-version = "1.0.0"
+version = "1.1.0"
 description = "Renewable energy and development across countries: World Bank and UN SDG 7.2.1, 2000–2021"
 readme = "README.md"
 license = { text = "MIT" }
@@ -16,6 +16,8 @@ dependencies = [
   "scipy>=1.10",
   "matplotlib>=3.8",
   "pycountry>=23.12",
+  "country_converter>=1.2",
+  "statsmodels>=0.14",
 ]
 
 [project.optional-dependencies]

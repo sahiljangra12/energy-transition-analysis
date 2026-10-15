@@ -69,8 +69,8 @@ def correlations(cs: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def changes(wb: pd.DataFrame, start: int = 2011, end: int = config.CROSS_SECTION_YEAR,
-            min_population: float = 1e6) -> pd.DataFrame:
+def changes(wb: pd.DataFrame, start: int = config.CHANGE_START, end: int = config.CROSS_SECTION_YEAR,
+            min_population: float = config.MIN_POPULATION) -> pd.DataFrame:
     """Change in renewable electricity share between two years, for countries of at least 1 million people."""
     d = wb[wb["year"].isin([start, end])].pivot(index="country_code", columns="year", values=ELEC).dropna()
     meta = wb[wb["year"] == end].set_index("country_code")[["country", "population"]]

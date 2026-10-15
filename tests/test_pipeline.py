@@ -66,3 +66,29 @@ def test_change_sample_excludes_small_countries(result):
     ch = result["tables"]["changes_2011_2021"]
     assert (ch["population"] >= 1e6).all()
     assert ch["change_pp"].is_monotonic_decreasing
+
+
+# --- models ---------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def model_result(tables):
+    from energy_transition import models
+    return models.run(tables["wb"])
+
+
+def test_every_country_has_a_continent(tables):
+    from energy_transition import models
+    assert models.add_continent(tables["wb"])["continent"].notna().all()
+
+
+def test_convergence(model_result):
+    s = model_result["summary"]
+    assert s["convergence_start_share"]["coef"] < 0
+    assert s["convergence_start_share"]["p_value"] < 0.01
+    assert (model_result["convergence_data"]["population"] >= 1e6).all()
+
+
+def test_coefficient_table(model_result):
+    coefs = model_result["coefficients"]
+    assert not coefs["term"].str.contains(r"C\(", regex=True).any()
+    assert (coefs["ci_low"] <= coefs["coef"]).all() and (coefs["coef"] <= coefs["ci_high"]).all()

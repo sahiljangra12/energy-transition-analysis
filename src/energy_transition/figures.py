@@ -114,8 +114,35 @@ def changes(ch: pd.DataFrame, path: Path, n: int = 8) -> Path:
     return _save(fig, path)
 
 
-def make_all(tables: dict, out: Path) -> list[Path]:
-    return [
+def convergence(d: pd.DataFrame, slope: float, path: Path) -> Path:
+    """Starting share against change, with the model's partial slope drawn through the means."""
+    fig, ax = plt.subplots(figsize=(8.5, 4.6))
+    ax.axhline(0, color=INK_2, lw=1)
+    ax.scatter(d["start_share"], d["change_pp"], s=26, color=BLUE, alpha=0.7, edgecolor=SURFACE, lw=0.6)
+    x = np.array([0, 100])
+    y = d["change_pp"].mean() + slope * (x - d["start_share"].mean())
+    ax.plot(x, y, color=ORANGE, lw=2)
+    note = f"Model slope: {slope:+.2f} pp per pp of starting share\n(controlling for income and continent)"
+    ax.text(0.98, 0.97, note, transform=ax.transAxes, ha="right", va="top", fontsize=9, color=INK)
+    labelled = pd.concat([d.nlargest(3, "change_pp"), d.nsmallest(3, "change_pp")]).sort_values("start_share")
+    for i, (_, r) in enumerate(labelled.iterrows()):
+        dy = 4 if r["change_pp"] > 0 else (-11 if i % 2 else 5)
+        dx = 5 if i % 2 or r["change_pp"] > 0 else -5
+        ax.annotate(r["country"], (r["start_share"], r["change_pp"]), xytext=(dx, dy), textcoords="offset points",
+                    ha="left" if dx > 0 else "right", fontsize=8.5, color=INK_2)
+    ax.set_xlim(-2, 102)
+    ax.set_xlabel("Renewable share of electricity in 2011 (%)")
+    ax.set_ylabel("Change to 2021 (percentage points)")
+    ax.set_title("Countries that started low gained the most: renewable electricity is converging")
+    return _save(fig, path)
+
+
+def make_all(tables: dict, out: Path, model_result: dict | None = None) -> list[Path]:
+    extra = []
+    if model_result is not None:
+        slope = model_result["summary"]["convergence_start_share"]["coef"]
+        extra.append(convergence(model_result["convergence_data"], slope, out / "fig5_convergence.png"))
+    return extra + [
         trend(tables["trend"], out / "fig1_trend.png"),
         income_gradient(tables["income_gradient"], out / "fig2_income_gradient.png"),
         scatter(tables["cross_section_2021"], out / "fig3_gdp_scatter.png"),

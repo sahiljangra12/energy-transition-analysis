@@ -30,19 +30,33 @@ How has renewable energy grown across countries since 2000, and how does it rela
 
 ![Biggest risers and fallers](figures/fig4_risers_fallers.png)
 
-All results are descriptive associations, not causal effects. Limitations are listed in the [research note](docs/report.md#limitations).
+**4. Low-share countries are catching up, and that holds after controlling for income and region.** In a regression of each country's 2011–2021 change on its 2011 share, log GDP per capita and continent, every 10 points of starting share means about 1.1 points less growth (p < 0.001, n = 149). Once that is accounted for, income has no effect on the rate of change. European countries gained about 13 points more than comparable African countries.
+
+![Starting share vs change, 2011–2021](figures/fig5_convergence.png)
+
+| Model (robust standard errors) | Key coefficient | Estimate | p-value | n |
+|---|---|---|---|---|
+| Electricity share, 2021, on income, population and continent | log GDP per capita | −6.6 pp | 0.002 | 197 |
+| Final-energy share, 2021, same controls | log GDP per capita | −9.2 pp | <0.001 | 205 |
+| Change 2011–2021, on starting share, income and continent | Starting share | −0.11 | <0.001 | 149 |
+| Electricity share, 2000–2021, country and year fixed effects | log GDP per capita | −2.5 pp | 0.11 | 4,312 |
+
+Two more points from the models. Within a country, rising income is not significantly linked to a changing renewable share (the fixed-effects model). And income, population and continent together explain only 15% of the cross-country variation in renewable electricity, compared with 49% for final energy: electricity depends mainly on things not in this data, such as hydro resources and policy. Full coefficients are in [`results/model_coefficients.csv`](results/model_coefficients.csv).
+
+All results, including the models, are associations, not causal effects. Limitations are listed in the [research note](docs/report.md#limitations).
 
 ## Method
 
 1. **Raw data:** the original API responses are stored unchanged in `data/raw/`, gzipped.
 2. **Clean:** only countries are kept. World Bank rows are matched to ISO 3166 alpha-3 codes and UN rows to ISO numeric codes, which removes every regional and income aggregate. The result is a country-year panel.
 3. **Analyse:** the trend is measured three ways (median of all reporting countries, median of a balanced panel, population-weighted mean). The pipeline also computes income-quartile comparisons, Spearman correlations with GDP per capita, and 2011–2021 changes for countries with at least 1 million people.
-4. **Publish:** it writes CSV results, static figures and a self-contained dashboard served by GitHub Pages.
+4. **Model:** OLS regressions with heteroskedasticity-robust (HC3) standard errors: a 2021 cross-section of renewable shares on log income, log population and continent; a convergence model of 2011–2021 change on starting share; and a country and year fixed-effects panel with errors clustered by country.
+5. **Publish:** it writes CSV results, static figures and a self-contained dashboard served by GitHub Pages.
 
 ## Repository
 
 ```
-src/energy_transition/   build.py (raw → clean) · analysis.py · figures.py · dashboard.py
+src/energy_transition/   build.py (raw → clean) · analysis.py · models.py · figures.py · dashboard.py
 data/raw/                World Bank and UN API responses (gzipped, unchanged)
 data/clean/              Country panel tables used by the analysis
 results/                 summary.json and one CSV per table

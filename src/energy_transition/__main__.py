@@ -9,7 +9,7 @@ import json
 import subprocess
 import sys
 
-from . import analysis, build, config, dashboard, figures
+from . import analysis, build, config, dashboard, figures, models
 
 
 def main(argv=None) -> int:
@@ -19,6 +19,9 @@ def main(argv=None) -> int:
 
     tables = build.build()
     result = analysis.run(tables["world_bank_wide"], tables["un_sdg_7_2_1"])
+    model_result = models.run(tables["world_bank_wide"])
+    result["tables"]["model_coefficients"] = model_result["coefficients"]
+    result["summary"]["models"] = model_result["summary"]
 
     config.RESULTS.mkdir(exist_ok=True)
     for name, df in result["tables"].items():
@@ -26,7 +29,7 @@ def main(argv=None) -> int:
     summary = json.dumps(result["summary"], indent=2, default=float)
     (config.RESULTS / "summary.json").write_text(summary + "\n", encoding="utf-8")
 
-    figures.make_all(result["tables"], config.FIGURES)
+    figures.make_all(result["tables"], config.FIGURES, model_result)
     dashboard.build(tables["world_bank_wide"], result, config.DOCS / "index.html")
     print(summary)
 

@@ -1,10 +1,12 @@
 # Renewable Energy and Development, 2000–2021: Research Note
 
+Version 1.1 · all numbers are produced by `python -m energy_transition`
+
 ## Questions
 
 1. How has the renewable share of electricity changed across countries since 2000, and does the answer depend on how the trend is measured?
 2. How does renewable energy relate to national income, and does that depend on whether we look at electricity or at all energy use?
-3. Which countries changed most between 2011 and 2021?
+3. Which countries changed most between 2011 and 2021, and are low-share countries catching up?
 
 ## Data
 
@@ -50,9 +52,27 @@ Among 151 countries with at least 1 million people, 74% increased their renewabl
 - **Largest increases:** Cambodia (+50 pp, new hydropower), Denmark (+39, wind), Liberia (+36), Nicaragua (+36), El Salvador, Estonia, Lithuania and the United Kingdom (around +30 each).
 - **Largest decreases:** Ghana (−33), the Republic of Congo (−32), Burundi (−30), Myanmar (−22) and Malawi (−19). All are hydro-dependent systems; the usual explanations are demand growth met with new fossil generation, or droughts cutting hydro output.
 
+### 4. Models: convergence, and the limits of income as an explanation
+
+All models are OLS with heteroskedasticity-robust (HC3) standard errors unless noted. Continent is the regional control (Africa is the baseline), and income enters as log GDP per capita.
+
+| Model | Term | Estimate | 95% CI | p | n | R² |
+|---|---|---|---|---|---|---|
+| Renewable electricity share, 2021 | log GDP per capita | −6.6 | −10.8 to −2.4 | 0.002 | 197 | 0.15 |
+| | Europe (vs Africa) | +22.5 | 5.6 to 39.3 | 0.009 | | |
+| Renewable final-energy share, 2021 | log GDP per capita | −9.2 | −12.1 to −6.3 | <0.001 | 205 | 0.49 |
+| Change in electricity share, 2011–2021 | Starting share, 2011 | −0.11 | −0.17 to −0.05 | <0.001 | 149 | 0.25 |
+| | log GDP per capita | −0.1 | −1.8 to 1.6 | 0.90 | | |
+| | Europe (vs Africa) | +12.9 | 6.5 to 19.4 | <0.001 | | |
+| Electricity share, 2000–2021, country and year fixed effects (errors clustered by country) | log GDP per capita | −2.5 | −5.5 to 0.6 | 0.11 | 4,312 | |
+
+- **Convergence.** Countries with lower renewable shares in 2011 gained more by 2021, at about 1.1 points less growth per 10 points of starting share. Some of this is mechanical, since shares are capped at 100% and several of the countries that fell started close to it. But the pattern holds across the range, and income adds nothing once the starting share is known.
+- **Income within the cross-section.** With continent and population held fixed, richer countries have lower renewable shares of electricity (−6.6 points per log unit of GDP per capita, about −15 points for a tenfold difference in income). The model still explains only 15% of the variation.
+- **Income within countries.** The fixed-effects model asks whether a country's share changes as its own income grows. The estimate is negative but not significant, so the cross-country income gradient should not be read as a development path that individual countries follow.
+
 ## Limitations
 
-- These are descriptive comparisons. Income, geography, resource endowment and policy are intertwined, and nothing here identifies a causal effect.
+- These are observational comparisons and regressions. Income, geography, resource endowment and policy are intertwined, and nothing here identifies a causal effect. The models have no measure of hydro or wind resources, which likely explains much of the unexplained variation.
 - A country median gives each country equal weight. The population-weighted average is not a generation-weighted global share, which would need total generation by country.
 - Renewable electricity data end in 2021 for most countries; UN SDG 7.2.1 has only 84 of 225 values for 2024, so 2023 is the latest comparable year.
 - The World Bank and UN final-energy series come from overlapping sources and are not independent confirmations of each other.

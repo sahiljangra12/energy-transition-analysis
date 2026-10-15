@@ -26,6 +26,8 @@ UN_SERIES = "EG_FEC_RNEW"
 TREND_START, TREND_END = 2000, 2021     # years with near-complete country coverage
 CROSS_SECTION_YEAR = 2021               # latest year with broad coverage for both electricity and GDP
 UN_YEAR = 2023                          # latest complete UN year (2024 has 84 of 225 values)
+CHANGE_START = 2011                     # start year for the 2011–2021 change and convergence model
+MIN_POPULATION = 1_000_000              # change analyses exclude very small countries
 
 # Colour-blind-checked palette (validated with the dataviz palette checker)
 BLUE, ORANGE, AQUA, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"

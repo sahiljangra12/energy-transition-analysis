@@ -1,0 +1,20 @@
+model,term,coef,std_err,p_value,ci_low,ci_high,n,r_squared
+"Electricity share, 2021",America (vs Africa),12.8740,7.4349,0.0834,-1.6983,27.4462,197,0.1526
+"Electricity share, 2021",Asia (vs Africa),-7.8009,7.3936,0.2914,-22.2921,6.6904,197,0.1526
+"Electricity share, 2021",Europe (vs Africa),22.4818,8.5963,0.0089,5.6334,39.3302,197,0.1526
+"Electricity share, 2021",Oceania (vs Africa),2.5410,8.3455,0.7608,-13.8158,18.8978,197,0.1526
+"Electricity share, 2021",log GDP per capita,-6.6109,2.1482,0.0021,-10.8213,-2.4004,197,0.1526
+"Electricity share, 2021",log population,2.4472,1.0529,0.0201,0.3835,4.5110,197,0.1526
+"Final-energy share, 2021",America (vs Africa),-15.3373,5.7001,0.0071,-26.5094,-4.1652,205,0.4942
+"Final-energy share, 2021",Asia (vs Africa),-26.4276,5.6703,0.0000,-37.5411,-15.3140,205,0.4942
+"Final-energy share, 2021",Europe (vs Africa),-2.2290,6.6011,0.7356,-15.1668,10.7089,205,0.4942
+"Final-energy share, 2021",Oceania (vs Africa),-17.4897,6.0331,0.0037,-29.3144,-5.6651,205,0.4942
+"Final-energy share, 2021",log GDP per capita,-9.1795,1.4715,0.0000,-12.0637,-6.2954,205,0.4942
+"Final-energy share, 2021",log population,1.4964,0.6889,0.0298,0.1462,2.8466,205,0.4942
+"Change in electricity share, 2011–2021",America (vs Africa),8.4995,3.5775,0.0175,1.4878,15.5112,149,0.2475
+"Change in electricity share, 2011–2021",Asia (vs Africa),0.3563,2.8527,0.9006,-5.2349,5.9475,149,0.2475
+"Change in electricity share, 2011–2021",Europe (vs Africa),12.9299,3.2894,0.0001,6.4828,19.3771,149,0.2475
+"Change in electricity share, 2011–2021",Oceania (vs Africa),8.0378,5.0531,0.1117,-1.8661,17.9417,149,0.2475
+"Change in electricity share, 2011–2021","Starting share, 2011",-0.1100,0.0310,0.0004,-0.1708,-0.0493,149,0.2475
+"Change in electricity share, 2011–2021",log GDP per capita,-0.1121,0.8612,0.8964,-1.8000,1.5758,149,0.2475
+"Electricity share, country and year fixed effects",log GDP per capita,-2.4606,1.5544,0.1134,-5.5072,0.5861,4312,0.9282
