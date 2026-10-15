@@ -17,7 +17,7 @@ TEMPLATE = (Path(__file__).parent / "dashboard_template.html").read_text(encodin
 def _mix_payload(mix: pd.DataFrame) -> dict:
     """Per country: years and TWh by source (sources that are always zero are left out)."""
     countries = {}
-    for code, g in mix.sort_values("year").groupby("country_code", sort=False):
+    for code, g in mix.sort_values(["country_code", "year"], kind="stable").groupby("country_code", sort=True):
         series = {k: [round(float(v), 3) for v in g[f"{k}_twh"]] for k in config.SOURCES}
         countries[code] = {"n": g["country"].iloc[0], "y": g["year"].astype(int).tolist(),
                            "s": {k: v for k, v in series.items() if any(v)}}

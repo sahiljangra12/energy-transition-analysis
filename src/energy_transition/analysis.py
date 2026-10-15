@@ -78,7 +78,8 @@ def changes(wb: pd.DataFrame, start: int = config.CHANGE_START, end: int = confi
     d = d[d["population"] >= min_population]
     d = d.rename(columns={start: f"share_{start}", end: f"share_{end}"})
     d["change_pp"] = d[f"share_{end}"] - d[f"share_{start}"]
-    return d.reset_index().sort_values("change_pp", ascending=False).reset_index(drop=True)
+    return (d.reset_index().sort_values(["change_pp", "country_code"], ascending=[False, True], kind="stable")
+             .reset_index(drop=True))
 
 
 def un_summary(un: pd.DataFrame, year: int = config.UN_YEAR) -> dict:

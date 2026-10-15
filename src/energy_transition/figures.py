@@ -124,7 +124,8 @@ def convergence(d: pd.DataFrame, slope: float, path: Path) -> Path:
     ax.plot(x, y, color=ORANGE, lw=2)
     note = f"Model slope: {slope:+.2f} pp per pp of starting share\n(controlling for income and continent)"
     ax.text(0.98, 0.97, note, transform=ax.transAxes, ha="right", va="top", fontsize=9, color=INK)
-    labelled = pd.concat([d.nlargest(3, "change_pp"), d.nsmallest(3, "change_pp")]).sort_values("start_share")
+    labelled = pd.concat([d.nlargest(3, "change_pp"), d.nsmallest(3, "change_pp")])
+    labelled = labelled.sort_values(["start_share", "country_code"], kind="stable")
     for i, (_, r) in enumerate(labelled.iterrows()):
         dy = 4 if r["change_pp"] > 0 else (-11 if i % 2 else 5)
         dx = 5 if i % 2 or r["change_pp"] > 0 else -5
