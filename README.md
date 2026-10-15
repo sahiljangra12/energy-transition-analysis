@@ -7,9 +7,9 @@
 
 How has renewable energy grown across countries since 2000, and how does it relate to national income? This project uses World Bank and UN SDG 7.2.1 data for 215 countries and areas. It runs from raw API responses to tested results, static figures and an interactive dashboard.
 
-**[Open the interactive dashboard →](https://sahiljangra12.github.io/energy-transition-analysis/)** · [Research note](docs/report.md) · [Data dictionary](docs/data_dictionary.md)
+**[Open the interactive dashboard →](https://sahiljangra12.github.io/energy-transition-analysis/)** · **[Technical report (PDF)](docs/technical-report/energy_transition_technical_report.pdf)** · [Research note](docs/report.md) · [Data dictionary](docs/data_dictionary.md)
 
-The dashboard has a world map by year, an income comparison, and a **country explorer**: pick any of 213 countries to see its electricity generation by source from 2000 to 2024 and a flow (Sankey) diagram of where its electricity came from in any year.
+The dashboard has a world map by year, an income comparison, and a **country explorer**: pick any of 214 countries to see its electricity generation by source from 2000 to 2024 and a flow (Sankey) diagram of where its electricity came from in any year.
 
 ## Key findings
 
@@ -63,7 +63,7 @@ data/raw/                World Bank and UN API responses, Our World in Data ener
 data/clean/              Country panel tables used by the analysis
 results/                 summary.json and one CSV per table
 figures/                 Static figures
-docs/                    Interactive dashboard (index.html), research note, data dictionary
+docs/                    Interactive dashboard (index.html), technical report (LaTeX + PDF), research note, data dictionary
 app.py                   Streamlit explorer
 tests/                   Data and results checks
 ```

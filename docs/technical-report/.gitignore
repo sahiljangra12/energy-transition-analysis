@@ -1,0 +1,10 @@
+# LaTeX build files (the compiled report is energy_transition_technical_report.pdf)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+main.pdf
