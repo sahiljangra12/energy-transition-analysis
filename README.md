@@ -9,6 +9,8 @@ How has renewable energy grown across countries since 2000, and how does it rela
 
 **[Open the interactive dashboard →](https://sahiljangra12.github.io/energy-transition-analysis/)** · [Research note](docs/report.md) · [Data dictionary](docs/data_dictionary.md)
 
+The dashboard has a world map by year, an income comparison, and a **country explorer**: pick any of 213 countries to see its electricity generation by source from 2000 to 2024 and a flow (Sankey) diagram of where its electricity came from in any year.
+
 ## Key findings
 
 **1. Renewable electricity has doubled for the typical country, more than the headline median suggests.** The set of reporting countries changes over time, which drags the raw median around (it drops in 2000 only because 62 more countries start reporting). Holding the same 187 countries fixed, the median renewable share of electricity rose from **10.3% in 2000 to 22.0% in 2021**.
@@ -57,7 +59,7 @@ All results, including the models, are associations, not causal effects. Limitat
 
 ```
 src/energy_transition/   build.py (raw → clean) · analysis.py · models.py · figures.py · dashboard.py
-data/raw/                World Bank and UN API responses (gzipped, unchanged)
+data/raw/                World Bank and UN API responses, Our World in Data energy file (gzipped, unchanged)
 data/clean/              Country panel tables used by the analysis
 results/                 summary.json and one CSV per table
 figures/                 Static figures
@@ -83,5 +85,6 @@ On every push, continuous integration lints the code and runs the tests. It then
 
 - World Bank Indicators API: [EG.ELC.RNEW.ZS](https://data.worldbank.org/indicator/EG.ELC.RNEW.ZS), [EG.FEC.RNEW.ZS](https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS), [NY.GDP.PCAP.CD](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD), [SP.POP.TOTL](https://data.worldbank.org/indicator/SP.POP.TOTL)
 - UN SDG Global Database, [indicator 7.2.1](https://unstats.un.org/sdgs/metadata/files/Metadata-07-02-01.pdf)
+- Electricity generation by source: [Our World in Data energy dataset](https://github.com/owid/energy-data) (CC BY 4.0), compiled from [Ember](https://ember-energy.org/data/yearly-electricity-data/) and the [Energy Institute Statistical Review of World Energy](https://www.energyinst.org/statistical-review/). Used for the dashboard's country explorer.
 
-Code is released under the MIT License. The data remain subject to the World Bank and UN terms of use.
+Code is released under the MIT License. The data remain subject to the World Bank and UN terms of use and the Our World in Data licence (CC BY 4.0).

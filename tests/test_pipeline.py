@@ -92,3 +92,19 @@ def test_coefficient_table(model_result):
     coefs = model_result["coefficients"]
     assert not coefs["term"].str.contains(r"C\(", regex=True).any()
     assert (coefs["ci_low"] <= coefs["coef"]).all() and (coefs["coef"] <= coefs["ci_high"]).all()
+
+
+def test_electricity_mix():
+    from energy_transition import config
+    mix = build.electricity_mix()
+    src = [f"{s}_twh" for s in config.SOURCES]
+    assert not mix.duplicated(["country_code", "year"]).any()
+    assert mix.groupby("year")["country_code"].nunique()[2023] >= 210
+    assert (mix[src] >= 0).all().all()
+    gap = (mix[src].sum(axis=1) - mix["total_twh"]).abs()
+    assert (gap <= 0.01 * mix["total_twh"].clip(lower=1)).all()       # sources add up to the total
+    ind = mix[(mix["country_code"] == "IND") & (mix["year"] == 2024)].iloc[0]
+    assert ind["coal_twh"] / ind["total_twh"] > 0.6                   # sanity: India is coal-heavy
+    world = build.world_electricity_mix()
+    assert world["year"].min() == 2000 and world["year"].max() >= 2024
+    assert world["total_twh"].iloc[-1] > 25_000                       # world generation is ~30,000 TWh

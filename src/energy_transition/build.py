@@ -76,6 +76,35 @@ def un_sdg_721() -> pd.DataFrame:
              .sort_values(["country_code", "year"]).reset_index(drop=True)
 
 
+def electricity_mix() -> pd.DataFrame:
+    """Electricity generation by source (TWh), one row per country and year.
+
+    Our World in Data compiles these from Ember and the Energy Institute. Rows are
+    kept for ISO 3166 countries in MIX_START..MIX_END that report total generation.
+    A missing source within such a row means the source is not reported for that
+    country, so it is set to 0; the sources then add up to total generation.
+    """
+    return _mix(lambda d: d["iso_code"].isin(ISO3))
+
+
+def world_electricity_mix() -> pd.DataFrame:
+    """The same table for the world total as published by Our World in Data (given code WLD here)."""
+    return _mix(lambda d: d["country"].eq("World")).assign(country_code="WLD", country="World")
+
+
+def _mix(rows) -> pd.DataFrame:
+    cols = [f"{s}_electricity" for s in config.SOURCES]
+    usecols = ["country", "year", "iso_code", "electricity_generation", *cols]
+    d = pd.read_csv(config.RAW / config.OWID_FILE, usecols=usecols)
+    d = d[rows(d) & d["year"].between(config.MIX_START, config.MIX_END)]
+    d = d.dropna(subset=["electricity_generation"]).copy()
+    d[cols] = d[cols].fillna(0.0)
+    d = d.rename(columns={"iso_code": "country_code", "electricity_generation": "total_twh",
+                          **{f"{s}_electricity": f"{s}_twh" for s in config.SOURCES}})
+    order = ["country_code", "country", "year", "total_twh"] + [f"{s}_twh" for s in config.SOURCES]
+    return d[order].sort_values(["country_code", "year"]).reset_index(drop=True)
+
+
 def build() -> dict[str, pd.DataFrame]:
     config.CLEAN.mkdir(parents=True, exist_ok=True)
     long = world_bank_long()
@@ -83,6 +112,8 @@ def build() -> dict[str, pd.DataFrame]:
         "world_bank_long": long,
         "world_bank_wide": world_bank_wide(long),
         "un_sdg_7_2_1": un_sdg_721(),
+        "electricity_by_source": electricity_mix(),
+        "electricity_by_source_world": world_electricity_mix(),
     }
     for name, df in tables.items():
         df.to_csv(config.CLEAN / f"{name}.csv", index=False, float_format="%.6g")

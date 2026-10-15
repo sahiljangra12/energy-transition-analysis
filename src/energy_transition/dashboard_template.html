@@ -24,6 +24,12 @@ input[type=range]{width:min(320px,60vw);accent-color:var(--accent)}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px;border:1px solid #d5d4cf}
 .takeaway{background:#f1f7f4;border-left:3px solid var(--accent);padding:10px 14px;border-radius:6px;font-size:14px;margin:6px 0 10px}
 ul.find{margin:6px 0 0;padding-left:20px}ul.find li{margin-bottom:6px}
+.ckpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:4px 0 14px}
+.ckpi{border:1px solid var(--line);border-radius:10px;padding:10px 12px}.ckpi b{display:block;font-size:20px}.ckpi span{color:var(--ink2);font-size:12.5px}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+h3{font-size:15px;margin:6px 0 2px}.seg{display:inline-flex;border:1px solid #cfcdc7;border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:13px;border:0;background:var(--panel);color:var(--ink2);padding:5px 10px;cursor:pointer}.seg button.on{background:var(--ink);color:#fff}
+select#country{min-width:220px}.src{font-size:12.5px;color:var(--ink2);margin:4px 0 8px}
 footer{color:var(--ink2);font-size:13px;line-height:1.7}footer a,.panel a{color:var(--accent)}
 @media print{body{background:#fff}.panel,.kpi{break-inside:avoid}}
 </style></head><body><div class="wrap">
@@ -49,6 +55,28 @@ footer{color:var(--ink2);font-size:13px;line-height:1.7}footer a,.panel a{color:
     <select id="measure" aria-label="Measure"><option value="final">Renewable share of all energy use</option><option value="elec">Renewable share of electricity only</option></select></div>
   <div id="scatter" style="height:440px"></div>
   <div class="takeaway" id="scatterNote"></div>
+</div>
+
+
+<div class="panel" id="explorer">
+  <h2>3. Explore a country: where does its electricity come from?</h2>
+  <p class="how">Pick a country (or the world) to see how its electricity mix has changed since 2000. The left chart shows generation by source each year. The flow diagram on the right shows, for one year, how each source feeds into fossil, nuclear or renewable power and then into the total. Use the year slider to move the flow diagram, and hover over any part for exact values.</p>
+  <div class="controls">Country <select id="country" aria-label="Country"></select></div>
+  <div class="ckpis" id="ckpis"></div>
+  <div class="grid2">
+    <div>
+      <div class="controls" style="justify-content:space-between"><h3 id="areaTitle">Electricity generation by source</h3>
+        <span class="seg" role="group" aria-label="Units"><button id="uTwh" class="on">TWh</button><button id="uPct">% of total</button></span></div>
+      <div id="area" style="height:380px"></div>
+    </div>
+    <div>
+      <div class="controls"><h3 id="sankeyTitle" style="margin-right:auto">Flow of electricity</h3></div>
+      <div class="controls">Year <input type="range" id="mixYear" aria-label="Year for flow diagram"><b id="mixYearLabel"></b></div>
+      <div id="sankey" style="height:350px"></div>
+    </div>
+  </div>
+  <div class="takeaway" id="countryNote"></div>
+  <p class="src">Data: Ember and Energy Institute, compiled by <a href="https://github.com/owid/energy-data">Our World in Data</a>. TWh = terawatt-hours. Latest year is 2024 for most countries (2023 for some).</p>
 </div>
 
 <div class="panel">
@@ -115,4 +143,99 @@ function drawScatter(){
   document.getElementById('scatterNote').textContent = notes[key];
 }
 ms.addEventListener('change', drawScatter); drawScatter();
+
+// ---- Country explorer ----
+const SRC = D.sources, MIX = D.mix;
+const GROUP_COL = {Fossil:'#6b6a66', Renewable:'#1b8a6b', Nuclear:'#8e6cc9'};
+const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`; };
+const pct = (v, t) => t > 0 ? 100 * v / t : 0;
+const fmt = v => v >= 1000 ? Math.round(v).toLocaleString('en-US') : v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2);
+const csel = document.getElementById('country'), my = document.getElementById('mixYear');
+let unit = 'twh';
+csel.innerHTML = MIX.order.map(c => `<option value="${c}">${MIX.c[c].n}</option>`).join('');
+if (MIX.c.WLD) csel.value = 'WLD';
+
+function at(c, i){   // values by source in year index i
+  const v = {}; let t = 0;
+  for (const s of SRC){ const x = c.s[s.k] ? c.s[s.k][i] : 0; v[s.k] = x; t += x; }
+  return {v, t};
+}
+function groupShare(c, i, pred){ const {v, t} = at(c, i); return pct(SRC.filter(pred).reduce((a, s) => a + v[s.k], 0), t); }
+
+function drawKpis(c){
+  const i0 = 0, i1 = c.y.length - 1, y0 = c.y[i0], y1 = c.y[i1];
+  const ren = s => s.group === 'Renewable', ws = s => s.k === 'wind' || s.k === 'solar';
+  const {v, t} = at(c, i1), t0 = at(c, i0).t;
+  const top = SRC.reduce((a, s) => v[s.k] > v[a.k] ? s : a, SRC[0]);
+  const k = [
+    [`${groupShare(c,i0,ren).toFixed(0)}% → ${groupShare(c,i1,ren).toFixed(0)}%`, `Renewable share of electricity, ${y0} → ${y1}`],
+    [`${groupShare(c,i0,ws).toFixed(1)}% → ${groupShare(c,i1,ws).toFixed(1)}%`, `Wind and solar share, ${y0} → ${y1}`],
+    [`${top.label} (${pct(v[top.k], t).toFixed(0)}%)`, `Largest source of electricity in ${y1}`],
+    [`${fmt(t)} TWh`, t0 > 0 ? `Electricity generated in ${y1} (${fmt(t0)} TWh in ${y0})` : `Electricity generated in ${y1}`],
+  ];
+  document.getElementById('ckpis').innerHTML = k.map(([b, s]) => `<div class="ckpi"><b>${b}</b><span>${s}</span></div>`).join('');
+  const inc = SRC.map(s => [s, (c.s[s.k] ? c.s[s.k][i1] - c.s[s.k][i0] : 0)]).sort((a, b) => b[1] - a[1])[0];
+  const r0 = groupShare(c,i0,ren), r1 = groupShare(c,i1,ren);
+  document.getElementById('countryNote').textContent =
+    `${c.n === 'World' ? 'Worldwide' : 'In ' + c.n}, renewables supplied ${r1.toFixed(0)}% of electricity in ${y1}, ` +
+    `${Math.abs(r1 - r0) < 1 ? 'about the same as' : r1 > r0 ? 'up from' : 'down from'} ${r0.toFixed(0)}% in ${y0}. ` +
+    (inc[1] > 0 ? `The biggest increase in generation came from ${inc[0].label.toLowerCase()} (+${fmt(inc[1])} TWh)` : '') +
+    (() => { const w = ['wind','solar'].reduce((a, k) => a + (c.s[k] ? c.s[k][i1] - c.s[k][i0] : 0), 0);
+             return inc[1] > 0 ? (inc[0].k !== 'wind' && inc[0].k !== 'solar' && w > 0 ? `, while wind and solar together added ${fmt(w)} TWh.` : '.') : ''; })();
+}
+
+function drawArea(c){
+  const yr = +my.value;
+  const traces = SRC.filter(s => c.s[s.k]).map(s => ({
+    type:'scatter', mode:'lines', stackgroup:'one', groupnorm: unit === 'pct' ? 'percent' : '',
+    x:c.y, y:c.s[s.k], name:s.label, line:{width:0.6, color:s.color}, fillcolor:rgba(s.color, 0.85),
+    hovertemplate: unit === 'pct' ? `${s.label}: %{y:.1f}%<extra></extra>` : `${s.label}: %{y:,.2f} TWh<extra></extra>`}));
+  Plotly.react('area', traces, {...base, margin:{l:56,r:10,t:6,b:30}, hovermode:'x unified',
+    legend:{orientation:'h', y:-0.12, font:{size:12, color:INK2}, traceorder:'normal'},
+    xaxis:{gridcolor:GRID, tickfont:{color:INK2}, dtick:5},
+    yaxis:{gridcolor:GRID, tickfont:{color:INK2}, ticksuffix: unit === 'pct' ? '%' : '', rangemode:'tozero',
+      title:{text: unit === 'pct' ? 'Share of generation' : 'Terawatt-hours (TWh)', font:{color:INK2, size:12}}},
+    shapes:[{type:'line', x0:yr, x1:yr, yref:'paper', y0:0, y1:1, line:{color:INK, width:1, dash:'dot'}}]}, cfg);
+}
+
+function drawSankey(c){
+  const i = c.y.indexOf(+my.value); if (i < 0) return;
+  const {v, t} = at(c, i);
+  document.getElementById('mixYearLabel').textContent = c.y[i];
+  document.getElementById('sankeyTitle').textContent = `Flow of electricity, ${c.n}, ${c.y[i]}`;
+  const live = SRC.filter(s => v[s.k] > 0);
+  const groups = ['Fossil', 'Nuclear', 'Renewable'].filter(g => live.some(s => s.group === g));
+  const labels = [], colors = [], idx = {};
+  const add = (key, label, color) => { idx[key] = labels.length; labels.push(label); colors.push(color); };
+  live.forEach(s => add(s.k, `${s.label} ${pct(v[s.k], t).toFixed(1)}%`, s.color));
+  groups.filter(g => g !== 'Nuclear').forEach(g => {
+    const gv = live.filter(s => s.group === g).reduce((a, s) => a + v[s.k], 0);
+    add('g:' + g, `${g} ${pct(gv, t).toFixed(0)}%`, GROUP_COL[g]);
+  });
+  add('total', `Total ${fmt(t)} TWh`, '#141413');
+  const src = [], tgt = [], val = [], lcol = [];
+  live.forEach(s => { src.push(idx[s.k]); tgt.push(s.group === 'Nuclear' ? idx.total : idx['g:' + s.group]); val.push(v[s.k]); lcol.push(rgba(s.color, 0.45)); });
+  groups.filter(g => g !== 'Nuclear').forEach(g => {
+    src.push(idx['g:' + g]); tgt.push(idx.total); val.push(live.filter(s => s.group === g).reduce((a, s) => a + v[s.k], 0)); lcol.push(rgba(GROUP_COL[g], 0.35));
+  });
+  Plotly.react('sankey', [{type:'sankey', arrangement:'snap', valueformat:',.2f', valuesuffix:' TWh',
+    node:{label:labels, color:colors, pad:14, thickness:16, line:{width:0}, hovertemplate:'%{label}<extra></extra>'},
+    link:{source:src, target:tgt, value:val, color:lcol, hovertemplate:'%{source.label} → %{target.label}<br>%{value}<extra></extra>'}}],
+    {...base, margin:{l:6,r:6,t:6,b:6}, font:{color:INK, family:FONT, size: narrow() ? 11 : 12}}, cfg);
+}
+
+function onCountry(){
+  const c = MIX.c[csel.value]; if (!c) return;
+  my.min = c.y[0]; my.max = c.y[c.y.length - 1]; my.value = my.max;
+  document.getElementById('areaTitle').textContent = `Electricity generation by source, ${c.n}`;
+  drawKpis(c); drawArea(c); drawSankey(c);
+}
+csel.addEventListener('change', onCountry);
+my.addEventListener('input', () => { const c = MIX.c[csel.value]; drawSankey(c); drawArea(c); });
+for (const [id, u] of [['uTwh','twh'], ['uPct','pct']]) document.getElementById(id).addEventListener('click', () => {
+  unit = u; document.getElementById('uTwh').classList.toggle('on', u === 'twh'); document.getElementById('uPct').classList.toggle('on', u === 'pct');
+  drawArea(MIX.c[csel.value]);
+});
+if (MIX.order.length) onCountry(); else document.getElementById('explorer').style.display = 'none';
+
 </script></body></html>

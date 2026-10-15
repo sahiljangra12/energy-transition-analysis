@@ -9,6 +9,8 @@ import json
 import subprocess
 import sys
 
+import pandas as pd
+
 from . import analysis, build, config, dashboard, figures, models
 
 
@@ -41,7 +43,8 @@ def main(argv=None) -> int:
     (config.RESULTS / "summary.json").write_text(summary + "\n", encoding="utf-8")
 
     figures.make_all(result["tables"], config.FIGURES, model_result)
-    dashboard.build(tables["world_bank_wide"], result, config.DOCS / "index.html")
+    mix = pd.concat([tables["electricity_by_source_world"], tables["electricity_by_source"]], ignore_index=True)
+    dashboard.build(tables["world_bank_wide"], result, config.DOCS / "index.html", mix)
     print(summary)
 
     if args.check:

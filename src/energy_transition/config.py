@@ -22,6 +22,22 @@ WB_FILES = {code: f"world_bank_{code.replace('.', '_')}.json.gz" for code in WB_
 UN_FILE = "un_sdg_721_data.json.gz"
 UN_SERIES = "EG_FEC_RNEW"
 
+# Electricity generation by source (Our World in Data energy dataset, built on Ember and the Energy Institute)
+OWID_FILE = "owid_energy_data.csv.gz"
+MIX_START, MIX_END = 2000, 2024
+# OWID column prefix -> (label, group, colour); order is the stacking order in the dashboard
+SOURCES = {
+    "coal": ("Coal", "Fossil", "#3f3f3d"),
+    "gas": ("Gas", "Fossil", "#8a8984"),
+    "oil": ("Oil", "Fossil", "#b9b8b2"),
+    "nuclear": ("Nuclear", "Nuclear", "#8e6cc9"),
+    "hydro": ("Hydro", "Renewable", "#2a78d6"),
+    "wind": ("Wind", "Renewable", "#1baf7a"),
+    "solar": ("Solar", "Renewable", "#eda100"),
+    "biofuel": ("Bioenergy", "Renewable", "#7ba23f"),
+    "other_renewable_exc_biofuel": ("Other renewables", "Renewable", "#57bcd0"),
+}
+
 # Analysis settings
 TREND_START, TREND_END = 2000, 2021     # years with near-complete country coverage
 CROSS_SECTION_YEAR = 2021               # latest year with broad coverage for both electricity and GDP

@@ -14,7 +14,18 @@ PLOTLY = "https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"
 TEMPLATE = (Path(__file__).parent / "dashboard_template.html").read_text(encoding="utf-8")
 
 
-def build(wb: pd.DataFrame, result: dict, out: Path) -> Path:
+def _mix_payload(mix: pd.DataFrame) -> dict:
+    """Per country: years and TWh by source (sources that are always zero are left out)."""
+    countries = {}
+    for code, g in mix.sort_values("year").groupby("country_code", sort=False):
+        series = {k: [round(float(v), 3) for v in g[f"{k}_twh"]] for k in config.SOURCES}
+        countries[code] = {"n": g["country"].iloc[0], "y": g["year"].astype(int).tolist(),
+                           "s": {k: v for k, v in series.items() if any(v)}}
+    rest = sorted((c for c in countries if c != "WLD"), key=lambda c: countries[c]["n"])
+    return {"order": (["WLD"] if "WLD" in countries else []) + rest, "c": countries}
+
+
+def build(wb: pd.DataFrame, result: dict, out: Path, mix: pd.DataFrame | None = None) -> Path:
     s = result["summary"]
     t = wb[wb["year"].between(config.TREND_START, config.TREND_END)].dropna(subset=["renewable_electricity_pct"])
     cs = result["tables"]["cross_section_2021"]
@@ -34,6 +45,9 @@ def build(wb: pd.DataFrame, result: dict, out: Path) -> Path:
         ],
         "map": [{"iso3": r.country_code, "name": r.country, "year": int(r.year),
                  "elec": rnd(r.renewable_electricity_pct)} for r in t.itertuples()],
+        "sources": [{"k": k, "label": lab, "group": grp, "color": col}
+                    for k, (lab, grp, col) in config.SOURCES.items()],
+        "mix": _mix_payload(mix) if mix is not None else {"order": [], "c": {}},
         "scatter": [{"name": r.country, "gdp": rnd(r.gdp_per_capita_usd), "elec": rnd(r.renewable_electricity_pct),
                      "final": rnd(r.renewable_final_energy_pct)} for r in cs.itertuples()],
     }
