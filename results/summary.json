@@ -4,64 +4,64 @@
     2021
   ],
   "median_all_reporting": [
-    13.888512821614,
-    22.8074034074034
+    13.8885,
+    22.8074
   ],
   "median_balanced_panel": [
-    10.2941176470588,
-    21.9775686385508
+    10.2941,
+    21.9776
   ],
   "balanced_panel_countries": 187,
   "population_weighted_mean": [
-    23.95412890682968,
-    30.126533625728516
+    23.9541,
+    30.1265
   ],
-  "share_of_countries_increasing_2011_2021": 0.7350993377483444,
-  "median_change_2011_2021_pp": 4.58928937838693,
+  "share_of_countries_increasing_2011_2021": 0.735099,
+  "median_change_2011_2021_pp": 4.58929,
   "countries_in_change_analysis": 151,
   "un_sdg_7_2_1": {
     "year": 2023,
     "countries": 225,
     "median": 18.32,
-    "mean": 27.333422222222225,
+    "mean": 27.3334,
     "values_in_2024": 84
   },
   "correlations": {
-    "Renewable electricity output (% of electricity)": -0.1673911107047674,
-    "Renewable energy (% of final energy, World Bank)": -0.5626678240553784,
-    "Renewable energy (% of final energy, UN SDG 7.2.1)": -0.5642246925414434
+    "Renewable electricity output (% of electricity)": -0.167391,
+    "Renewable energy (% of final energy, World Bank)": -0.562668,
+    "Renewable energy (% of final energy, UN SDG 7.2.1)": -0.564225
   },
   "models": {
     "cross_section_log_gdp": {
       "Electricity share, 2021": {
-        "coef": -6.610871394317839,
-        "p_value": 0.002088554823688764,
+        "coef": -6.61087,
+        "p_value": 0.00208855,
         "n": 197
       },
       "Final-energy share, 2021": {
-        "coef": -9.179531590327759,
-        "p_value": 4.4314853790229584e-10,
+        "coef": -9.17953,
+        "p_value": 4.43149e-10,
         "n": 205
       }
     },
     "cross_section_r_squared": {
-      "Electricity share, 2021": 0.15263948263487703,
-      "Final-energy share, 2021": 0.49423059916252454
+      "Electricity share, 2021": 0.152639,
+      "Final-energy share, 2021": 0.494231
     },
     "convergence_start_share": {
-      "coef": -0.11003186141443479,
-      "p_value": 0.00038650816113679367,
+      "coef": -0.110032,
+      "p_value": 0.000386508,
       "n": 149
     },
     "convergence_log_gdp": {
-      "coef": -0.11214528467178925,
-      "p_value": 0.8963913728916526,
+      "coef": -0.112145,
+      "p_value": 0.896391,
       "n": 149
     },
-    "convergence_r_squared": 0.2475141145421178,
+    "convergence_r_squared": 0.247514,
     "within_country_log_gdp": {
-      "coef": -2.460582909358667,
-      "p_value": 0.11343674985715198,
+      "coef": -2.46058,
+      "p_value": 0.113437,
       "n": 4312
     }
   }

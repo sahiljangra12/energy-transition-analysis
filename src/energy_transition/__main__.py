@@ -12,6 +12,17 @@ import sys
 from . import analysis, build, config, dashboard, figures, models
 
 
+def _rounded(obj, sig: int = 6):
+    """Round floats to a fixed number of significant digits so results are stable across library versions."""
+    if isinstance(obj, dict):
+        return {k: _rounded(v, sig) for k, v in obj.items()}
+    if isinstance(obj, list | tuple):
+        return [_rounded(v, sig) for v in obj]
+    if isinstance(obj, bool | int | str) or obj is None:
+        return obj
+    return float(f"{float(obj):.{sig}g}")
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--check", action="store_true", help="fail if regenerated results differ from git")
@@ -26,7 +37,7 @@ def main(argv=None) -> int:
     config.RESULTS.mkdir(exist_ok=True)
     for name, df in result["tables"].items():
         df.to_csv(config.RESULTS / f"{name}.csv", index=False, float_format="%.4f")
-    summary = json.dumps(result["summary"], indent=2, default=float)
+    summary = json.dumps(_rounded(result["summary"]), indent=2)
     (config.RESULTS / "summary.json").write_text(summary + "\n", encoding="utf-8")
 
     figures.make_all(result["tables"], config.FIGURES, model_result)
@@ -37,7 +48,10 @@ def main(argv=None) -> int:
         diff = subprocess.run(["git", "status", "--porcelain", "--", "data/clean", "results", "docs/index.html"],
                               cwd=config.ROOT, capture_output=True, text=True, check=False).stdout
         if diff.strip():
-            print("Outputs changed compared with the committed versions:\n" + diff)
+            detail = subprocess.run(["git", "diff", "--stat", "--", "data/clean", "results", "docs/index.html"],
+                                    cwd=config.ROOT, capture_output=True, text=True, check=False).stdout
+            print("Outputs changed compared with the committed versions:\n" + diff + detail)
+            subprocess.run(["git", "--no-pager", "diff", "-U0", "--", "results"], cwd=config.ROOT, check=False)
             return 1
         print("Outputs match the committed versions.")
     return 0
