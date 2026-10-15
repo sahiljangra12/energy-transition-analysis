@@ -34,32 +34,11 @@ footer{color:var(--ink2);font-size:13px;line-height:1.7}footer a,.panel a{color:
 @media print{body{background:#fff}.panel,.kpi{break-inside:avoid}}
 </style></head><body><div class="wrap">
 <div class="kicker">Sahil · Energy transition analysis</div>
-<h1>Renewable energy and development, 2000–2021</h1>
-<p class="sub">How much of each country's energy comes from renewable sources (hydro, wind, solar, bioenergy), how that has changed since 2000, and how it relates to national income. Data for 215 countries and areas from the World Bank and the UN SDG database.</p>
-
-<div class="kpis" id="kpis"></div>
-
-<div class="panel">
-  <h2>1. Where does electricity come from renewables?</h2>
-  <p class="how">Each country is shaded by the share of its electricity generated from renewable sources. Darker blue means more renewable. Drag the slider to see any year from 2000 to 2021, and hover over a country for its exact value.</p>
-  <div class="controls">Year <input type="range" id="year" aria-label="Year"><b id="yearLabel"></b></div>
-  <div class="legend"><span><i class="sw" style="background:#eef4fc"></i>0–20%</span><span><i class="sw" style="background:#8fb8ea"></i>around 50%</span><span><i class="sw" style="background:#1d5aa6"></i>80–100%</span><span><i class="sw" style="background:#d9d8d3"></i>No data</span></div>
-  <div id="map" style="height:460px"></div>
-  <div class="takeaway">Countries with large rivers and hydropower (Brazil, Norway, much of Central and Southern Africa) are darkest. Slide back to 2000 and compare: Germany, the UK and Spain get noticeably darker by 2021 as wind and solar grow.</div>
-</div>
-
-<div class="panel">
-  <h2>2. Are richer countries more renewable?</h2>
-  <p class="how">Each dot is one country in 2021. Left to right is GDP per person (log scale, so each step is ten times richer). Bottom to top is the renewable share. Switch between the two measures to see why the answer depends on what you count.</p>
-  <div class="controls">Measure
-    <select id="measure" aria-label="Measure"><option value="final">Renewable share of all energy use</option><option value="elec">Renewable share of electricity only</option></select></div>
-  <div id="scatter" style="height:440px"></div>
-  <div class="takeaway" id="scatterNote"></div>
-</div>
-
+<h1>Renewable energy and development, 2000–2024</h1>
+<p class="sub">Where each country's electricity comes from, how that has changed since 2000, and how renewable energy relates to national income. Electricity by source from Ember (via Our World in Data, to 2024); renewable shares and income from the World Bank and the UN SDG database (to 2021).</p>
 
 <div class="panel" id="explorer">
-  <h2>3. Explore a country: where does its electricity come from?</h2>
+  <h2>1. Explore a country: where does its electricity come from?</h2>
   <p class="how">Pick a country (or the world) to see how its electricity mix has changed since 2000. The left chart shows generation by source each year. The flow diagram on the right shows, for one year, how each source feeds into fossil, nuclear or renewable power and then into the total. Use the year slider to move the flow diagram, and hover over any part for exact values.</p>
   <div class="controls">Country <select id="country" aria-label="Country"></select></div>
   <div class="ckpis" id="ckpis"></div>
@@ -78,6 +57,28 @@ footer{color:var(--ink2);font-size:13px;line-height:1.7}footer a,.panel a{color:
   <div class="takeaway" id="countryNote"></div>
   <p class="src">Data: Ember and Energy Institute, compiled by <a href="https://github.com/owid/energy-data">Our World in Data</a>. TWh = terawatt-hours. Latest year is 2024 for most countries (2023 for some).</p>
 </div>
+
+<h2 style="font-size:19px;margin:8px 0 10px">Global picture</h2>
+<div class="kpis" id="kpis"></div>
+
+<div class="panel">
+  <h2>2. Renewable electricity around the world</h2>
+  <p class="how">Each country is shaded by the share of its electricity generated from renewable sources. Darker blue means more renewable. Drag the slider to see any year from 2000 to 2021, and hover over a country for its exact value.</p>
+  <div class="controls">Year <input type="range" id="year" aria-label="Year"><b id="yearLabel"></b></div>
+  <div class="legend"><span><i class="sw" style="background:#eef4fc"></i>0–20%</span><span><i class="sw" style="background:#8fb8ea"></i>around 50%</span><span><i class="sw" style="background:#1d5aa6"></i>80–100%</span><span><i class="sw" style="background:#d9d8d3"></i>No data</span></div>
+  <div id="map" style="height:460px"></div>
+  <div class="takeaway">Countries with large rivers and hydropower (Brazil, Norway, much of Central and Southern Africa) are darkest. Slide back to 2000 and compare: Germany, the UK and Spain get noticeably darker by 2021 as wind and solar grow.</div>
+</div>
+
+<div class="panel">
+  <h2>3. Are richer countries more renewable?</h2>
+  <p class="how">Each dot is one country in 2021. Left to right is GDP per person (log scale, so each step is ten times richer). Bottom to top is the renewable share. Switch between the two measures to see why the answer depends on what you count.</p>
+  <div class="controls">Measure
+    <select id="measure" aria-label="Measure"><option value="final">Renewable share of all energy use</option><option value="elec">Renewable share of electricity only</option></select></div>
+  <div id="scatter" style="height:440px"></div>
+  <div class="takeaway" id="scatterNote"></div>
+</div>
+
 
 <div class="panel">
   <h2>What this shows</h2>
