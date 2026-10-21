@@ -9,7 +9,7 @@ How has renewable energy grown across countries since 2000, and how does it rela
 
 **[Open the interactive dashboard →](https://sahiljangra12.github.io/energy-transition-analysis/)** · **[Technical report (PDF)](docs/technical-report/energy_transition_technical_report.pdf)** · [Research note](docs/report.md) · [Data dictionary](docs/data_dictionary.md)
 
-The dashboard has a world map by year, an income comparison, and a **country explorer**: pick any of 214 countries to see its electricity generation by source from 2000 to 2024 and a flow (Sankey) diagram of where its electricity came from in any year.
+The dashboard opens with the world's electricity mix in 2000 and 2024, then has a **country explorer**: pick any of 214 countries to see its electricity generation by source from 2000 to 2024, a flow (Sankey) diagram for any year, and its rank among countries. It also has an animated world map, the global trend, an income comparison, the biggest risers and fallers of 2011–2021, and a glossary. Click a country on the map or the charts to open it in the explorer, and share a country directly with a link such as [`?country=IND`](https://sahiljangra12.github.io/energy-transition-analysis/?country=IND). It has a dark mode and works on phones.
 
 ## Key findings
 

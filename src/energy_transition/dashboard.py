@@ -30,6 +30,8 @@ def build(wb: pd.DataFrame, result: dict, out: Path, mix: pd.DataFrame | None = 
     t = wb[wb["year"].between(config.TREND_START, config.TREND_END)].dropna(subset=["renewable_electricity_pct"])
     cs = result["tables"]["cross_section_2021"]
     ig = result["tables"]["income_gradient"]["median_renewable_final_energy_pct"]
+    ch = result["tables"]["changes_2011_2021"].rename(
+        columns={f"share_{config.CHANGE_START}": "a", f"share_{config.CROSS_SECTION_YEAR}": "b"})
     rnd = lambda v: None if pd.isna(v) else round(float(v), 2)  # noqa: E731
     data = {
         "years": list(range(config.TREND_START, config.TREND_END + 1)),
@@ -48,12 +50,26 @@ def build(wb: pd.DataFrame, result: dict, out: Path, mix: pd.DataFrame | None = 
         "sources": [{"k": k, "label": lab, "group": grp, "color": col}
                     for k, (lab, grp, col) in config.SOURCES.items()],
         "mix": _mix_payload(mix) if mix is not None else {"order": [], "c": {}},
-        "scatter": [{"name": r.country, "gdp": rnd(r.gdp_per_capita_usd), "elec": rnd(r.renewable_electricity_pct),
-                     "final": rnd(r.renewable_final_energy_pct)} for r in cs.itertuples()],
+        "scatter": [{"c": r.country_code, "name": r.country, "gdp": rnd(r.gdp_per_capita_usd),
+                     "elec": rnd(r.renewable_electricity_pct), "final": rnd(r.renewable_final_energy_pct)}
+                    for r in cs.itertuples()],
+        "trend": [{"y": int(r.year), "bal": rnd(r.median_balanced_panel), "all": rnd(r.median_all_reporting),
+                   "n": int(r.n_reporting), "pop": rnd(r.population_weighted_mean)}
+                  for r in result["tables"]["trend"].itertuples()],
+        "quartiles": [{"q": str(r.gdp_quartile), "gdp": rnd(r.median_gdp_per_capita_usd),
+                       "elec": rnd(r.median_renewable_electricity_pct),
+                       "final": rnd(r.median_renewable_final_energy_pct)}
+                      for r in result["tables"]["income_gradient"].itertuples()],
+        "movers": [{"c": r.country_code, "n": r.country, "a": rnd(r.a), "b": rnd(r.b),
+                    "d": rnd(r.change_pp)}
+                   for r in pd.concat([ch.head(10), ch.tail(10)]).itertuples()],
+        "nChange": int(len(ch)),
     }
     rho = s["correlations"]
     html = (TEMPLATE.replace("__RHO_FINAL__", f"{rho['Renewable energy (% of final energy, World Bank)']:.2f}")
-            .replace("__RHO_ELEC__", f"{rho['Renewable electricity output (% of electricity)']:.2f}"))
+            .replace("__RHO_ELEC__", f"{rho['Renewable electricity output (% of electricity)']:.2f}")
+            .replace("__N_BAL__", str(s["balanced_panel_countries"]))
+            .replace("__N_CHANGE__", str(s["countries_in_change_analysis"])))
     html = html.replace("__PLOTLY__", PLOTLY).replace("__DATA__", json.dumps(data, separators=(",", ":")))
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
