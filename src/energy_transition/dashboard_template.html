@@ -1,171 +1,214 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark">
 <title>Energy Transition Explorer</title>
 <meta name="description" content="Where each country's electricity comes from, how it has changed since 2000, and how renewable energy relates to national income.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://thumb.wikimedia.org" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="__PLOTLY__"></script>
 <style>
 :root{
-  --bg:#f2f5f4; --surface:#ffffff; --ink:#15211d; --ink-2:#56625d; --ink-3:#7d8883;
-  --line:#d9e0dd; --grid:#e5eae8; --land:#d6dcd9; --accent:#0f7b5f; --accent-soft:#e1f0eb;
-  --down:#c8551f; --elec:#2a78d6; --final:#eb6834; --chip:#e7ecea;
-  --display:'Bricolage Grotesque','IBM Plex Sans',system-ui,sans-serif;
-  --text:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+  --bg:#000; --surface:#0b0b0b; --ink:#f5f5f5; --ink-2:#b4b4b4; --ink-3:#7c7c7c;
+  --line:#2b2b2b; --grid:#1f1f1f; --land:#2e2e2e; --accent:#3cc29a; --down:#f08a52;
+  --elec:#5b9cf0; --final:#f08a52; --chip:#151515;
+  --display:'Barlow Condensed','Barlow',system-ui,sans-serif;
+  --text:'Barlow',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0e1513; --surface:#151e1b; --ink:#e3ebe8; --ink-2:#a3b0ab; --ink-3:#7a8783;
-  --line:#26322e; --grid:#202b27; --land:#2b3633; --accent:#3cc29a; --accent-soft:#16302a;
-  --down:#f08a52; --elec:#5b9cf0; --final:#f08a52; --chip:#1c2724;}}
-:root[data-theme="dark"]{
-  --bg:#0e1513; --surface:#151e1b; --ink:#e3ebe8; --ink-2:#a3b0ab; --ink-3:#7a8783;
-  --line:#26322e; --grid:#202b27; --land:#2b3633; --accent:#3cc29a; --accent-soft:#16302a;
-  --down:#f08a52; --elec:#5b9cf0; --final:#f08a52; --chip:#1c2724;}
 *{box-sizing:border-box}
-html{scroll-padding-top:64px}
+html{scroll-padding-top:70px;background:#000}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--text);-webkit-font-smoothing:antialiased}
-.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
-a{color:var(--accent)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--text);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+@media (max-width:640px){.wrap{padding:0 16px}}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .num{font-variant-numeric:tabular-nums}
 
-/* Hero */
-header.hero{padding:44px 0 30px}
-.byline{color:var(--ink-2);font-size:14px;margin:0 0 14px}
-.byline a{color:inherit;text-decoration-color:var(--line)}
-h1{font-family:var(--display);font-weight:750;font-size:clamp(34px,5.6vw,60px);line-height:1.02;letter-spacing:-0.02em;margin:0 0 16px;max-width:15ch}
-.lede{color:var(--ink-2);font-size:18px;max-width:62ch;margin:0 0 30px}
-.spectrum{display:grid;grid-template-columns:52px 1fr;gap:8px 14px;align-items:center}
-.spectrum .yr{font-family:var(--display);font-weight:650;font-size:18px;color:var(--ink-2)}
-.bar{display:flex;height:46px;border-radius:6px;overflow:hidden;background:var(--chip)}
-.bar.thin{height:46px}
-.seg{position:relative;display:flex;align-items:center;padding:0 8px;min-width:0;color:#fff;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden}
-.seg.light{color:#15211d}
-.seg+.seg{box-shadow:inset 1px 0 0 rgba(255,255,255,.35)}
-.spec-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:14px 0 0 66px;font-size:13px;color:var(--ink-2)}
-.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:0}
-.spec-note{margin:14px 0 0 66px;font-size:15px;max-width:70ch}
-@media (max-width:640px){.spectrum{grid-template-columns:40px 1fr}.spectrum .yr{font-size:15px}.spec-legend,.spec-note{margin-left:0}.bar{height:38px}.seg{font-size:11.5px;padding:0 5px}}
+/* Top bar */
+.topbar{position:fixed;inset:0 0 auto 0;z-index:40;height:68px;display:flex;align-items:center;transition:background .3s}
+.topbar.solid{background:rgba(0,0,0,.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.topbar .wrap{display:flex;align-items:center;gap:24px;width:100%}
+.brand{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;white-space:nowrap}
+.brand small{display:block;font-family:var(--text);font-weight:500;font-size:11px;letter-spacing:.12em;color:var(--ink-2)}
+.toplinks{display:flex;gap:22px;list-style:none;margin:0 0 0 auto;padding:0}
+.toplinks a{font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--ink);opacity:.85;padding:6px 0;border-bottom:2px solid transparent}
+.toplinks a:hover,.toplinks a.active{opacity:1;border-bottom-color:#fff}
+.menubtn{display:none;margin-left:auto;background:none;border:0;color:#fff;cursor:pointer;padding:8px;width:44px;height:44px}
+.menubtn span{display:block;height:2px;background:#fff;margin:6px 0;transition:transform .25s,opacity .25s}
+.menu-open .menubtn span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.menu-open .menubtn span:nth-child(2){opacity:0}
+.menu-open .menubtn span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+.drawer{position:fixed;inset:0 0 0 auto;width:min(360px,100%);background:#000;z-index:35;padding:96px 32px 32px;transform:translateX(100%);transition:transform .3s;border-left:1px solid var(--line)}
+.drawer a{display:block;font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;padding:12px 0;border-bottom:1px solid var(--line)}
+.menu-open .drawer{transform:none}
+@media (max-width:1040px){.toplinks{display:none}.menubtn{display:block}}
 
-/* Sticky section nav */
-nav.sections{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-nav.sections .wrap{display:flex;align-items:center;gap:4px;height:52px}
-nav.sections ul{display:flex;gap:2px;list-style:none;margin:0;padding:0;overflow-x:auto;scrollbar-width:none;flex:1}
-nav.sections ul::-webkit-scrollbar{display:none}
-nav.sections a{display:block;padding:6px 11px;border-radius:999px;color:var(--ink-2);text-decoration:none;font-size:14px;font-weight:500;white-space:nowrap}
-nav.sections a:hover{color:var(--ink);background:var(--chip)}
-nav.sections a.active{color:var(--ink);background:var(--accent-soft);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent)}
-.iconbtn{flex:none;font:inherit;font-size:13px;color:var(--ink-2);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer}
-.iconbtn:hover{color:var(--ink);border-color:var(--ink-3)}
+/* Full-screen photo panels */
+.panel{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;background:#000}
+.panel.short{min-height:78svh}
+.panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.panel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,.15) 55%,rgba(0,0,0,.88) 100%)}
+.panel .copy{position:relative;z-index:2;width:100%;padding-bottom:9vh}
+.eyebrow{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:0 0 10px}
+h1,h2.title{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.02em;line-height:.98;margin:0 0 18px}
+h1{font-size:clamp(46px,8.4vw,108px);max-width:12ch}
+h2.title{font-size:clamp(38px,6vw,76px);max-width:14ch}
+.panel p.lead{font-size:clamp(17px,1.6vw,20px);max-width:52ch;margin:0 0 28px;color:#e6e6e6}
+.stat-line{display:flex;gap:34px;flex-wrap:wrap;margin:0 0 28px}
+.stat-line div b{display:block;font-family:var(--display);font-weight:700;font-size:clamp(34px,4.2vw,52px);line-height:1}
+.stat-line div span{font-size:14px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.08em}
+.btn{display:inline-block;font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:#fff;border:2px solid #fff;padding:13px 28px;background:transparent;cursor:pointer;transition:background .2s,color .2s}
+.btn:hover{background:#fff;color:#000}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.credit{position:absolute;right:16px;bottom:10px;z-index:2;font-size:11px;color:rgba(255,255,255,.55)}
+.credit a{color:inherit}
+@media (prefers-reduced-motion:no-preference){
+  .hero img{animation:drift 14s ease-out both}
+  @keyframes drift{from{transform:scale(1.12)}to{transform:scale(1)}}
+}
+.hero img{object-position:50% 38%}
+@media (max-width:640px){.panel .copy{padding-bottom:7vh}.hero img{object-position:58% 40%}}
 
-/* Sections */
-section{padding:52px 0 8px;border-top:1px solid var(--line)}
-section:first-of-type{border-top:0}
-h2{font-family:var(--display);font-weight:700;font-size:clamp(24px,3vw,32px);line-height:1.15;letter-spacing:-0.01em;margin:0 0 8px;max-width:28ch}
-h3{font-family:var(--display);font-weight:650;font-size:17px;margin:0 0 4px}
-p.how{color:var(--ink-2);margin:0 0 18px;max-width:72ch}
+/* Content blocks after each photo */
+.content{padding:64px 0 88px}
+.intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:24px 56px;align-items:start;margin-bottom:34px}
+.intro h3{font-family:var(--display);font-weight:600;font-size:24px;text-transform:uppercase;letter-spacing:.06em;margin:0}
+.intro p{margin:0;color:var(--ink-2);max-width:62ch}
+@media (max-width:820px){.intro{grid-template-columns:1fr}}
+h4{font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 6px;color:var(--ink-2)}
 .chart{width:100%}
-.figure{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 8px}
-.takeaway{border-left:3px solid var(--accent);padding:4px 0 4px 14px;margin:16px 0 4px;max-width:78ch}
-.src{font-size:13px;color:var(--ink-3);margin:8px 0 0}
+.figure{border-top:1px solid var(--line);padding-top:16px}
+.takeaway{border-left:2px solid #fff;padding:2px 0 2px 16px;margin:22px 0 4px;max-width:80ch}
+.src{font-size:13px;color:var(--ink-3);margin:10px 0 0}
 .src a{color:inherit}
 
-/* Controls */
-.controls{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;margin:0 0 12px;color:var(--ink-2);font-size:14px}
-.controls .val{font-family:var(--display);font-weight:700;color:var(--ink);font-size:20px;min-width:48px}
-label.field{display:flex;align-items:center;gap:8px}
-select{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
-select#country{min-width:240px;font-weight:500}
-input[type=range]{width:min(320px,52vw);accent-color:var(--accent)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button,.toggle button,.play{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:5px 12px;border-radius:999px;cursor:pointer}
-.chips button:hover,.toggle button:hover,.play:hover{color:var(--ink);border-color:var(--ink-3)}
-.chips button[aria-pressed="true"],.toggle button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.toggle{display:inline-flex;gap:4px}
-.play{display:inline-flex;align-items:center;gap:6px;min-width:76px;justify-content:center}
-.share{margin-left:auto}
+/* World mix bars (after hero) */
+.spectrum{display:grid;grid-template-columns:60px 1fr;gap:10px 16px;align-items:center}
+.spectrum .yr{font-family:var(--display);font-weight:700;font-size:24px}
+.bar{display:flex;height:52px;overflow:hidden;background:var(--chip)}
+.seg{display:flex;align-items:center;padding:0 9px;min-width:0;color:#fff;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden}
+.seg.light{color:#111}
+.seg+.seg{box-shadow:inset 1px 0 0 rgba(0,0,0,.35)}
+.spec-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:16px 0 0 76px;font-size:14px;color:var(--ink-2)}
+.sw{display:inline-block;width:10px;height:10px;margin-right:7px}
+.spec-note{margin:16px 0 0 76px;max-width:72ch}
+@media (max-width:640px){.spectrum{grid-template-columns:44px 1fr}.spectrum .yr{font-size:18px}.spec-legend,.spec-note{margin-left:0}.bar{height:40px}.seg{font-size:12px;padding:0 5px}}
 
-/* Country figures */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px 22px;margin:18px 0 22px}
-.stat{border-top:2px solid var(--ink);padding-top:10px}
+/* Controls */
+.controls{display:flex;gap:12px 16px;align-items:center;flex-wrap:wrap;margin:0 0 16px;color:var(--ink-2);font-size:15px}
+.controls .val{font-family:var(--display);font-weight:700;color:var(--ink);font-size:26px;min-width:56px}
+.controls.yearrow{flex-wrap:nowrap}
+.controls.yearrow input[type=range]{flex:1;width:auto;min-width:0;max-width:420px}
+label.field{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+select{font:inherit;font-family:var(--text);font-size:16px;letter-spacing:0;text-transform:none;color:#fff;background:#000;border:1px solid #fff;padding:10px 14px}
+select#country{min-width:260px;font-weight:500}
+input[type=range]{accent-color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button,.toggle button,.play,.ghost{font-family:var(--display);font-weight:600;font-size:13.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid #555;background:transparent;color:var(--ink-2);padding:7px 14px;cursor:pointer}
+.chips button:hover,.toggle button:hover,.play:hover,.ghost:hover{color:#fff;border-color:#fff}
+.chips button[aria-pressed="true"],.toggle button[aria-pressed="true"]{background:#fff;border-color:#fff;color:#000}
+.toggle{display:inline-flex;gap:6px;flex-wrap:wrap}
+.play{min-width:92px}
+.share{margin-left:auto}
+@media (max-width:640px){.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}.chips::-webkit-scrollbar{display:none}.chips button{flex:none}.share{margin-left:0}select#country{min-width:0;flex:1}label.field{flex:1}}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:22px 28px;margin:26px 0 30px}
+.stat{border-top:1px solid #fff;padding-top:12px}
 .stat.ren{border-color:var(--accent)}
-.stat b{display:block;font-family:var(--display);font-weight:700;font-size:24px;line-height:1.15;font-variant-numeric:tabular-nums}
-.stat span{display:block;color:var(--ink-2);font-size:13.5px;line-height:1.45;margin-top:4px}
-.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.stat b{display:block;font-family:var(--display);font-weight:700;font-size:32px;line-height:1.05;font-variant-numeric:tabular-nums}
+.stat span{display:block;color:var(--ink-2);font-size:14px;line-height:1.45;margin-top:6px}
+@media (max-width:640px){.stats{grid-template-columns:1fr 1fr;gap:18px 16px}.stat b{font-size:23px}.stat span{font-size:13px}}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:36px}
 .grid2.even{grid-template-columns:1.4fr 1fr}
 @media (max-width:880px){.grid2,.grid2.even{grid-template-columns:1fr}}
-.controls.yearrow{flex-wrap:nowrap}
-.controls.yearrow input[type=range]{flex:1;width:auto;min-width:0;max-width:360px}
-.figure .head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
-
-/* Global figures */
-.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;margin:22px 0 6px}
-.big .stat b{font-size:30px}
-
-.legend{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:13px;color:var(--ink-2);margin:0 0 6px}
-.hint{font-size:13px;color:var(--ink-3)}
+.figure .head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 
 /* Findings and terms */
-ul.find{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:18px;max-width:80ch}
-ul.find li{display:grid;grid-template-columns:26px 1fr;gap:4px}
-ul.find li::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--accent);margin-top:7px}
-ul.find b{font-weight:600}
-dl.terms{display:grid;grid-template-columns:minmax(150px,220px) 1fr;gap:12px 24px;max-width:900px;margin:8px 0 0}
-dl.terms dt{font-weight:600}
-dl.terms dd{margin:0;color:var(--ink-2)}
-@media (max-width:640px){dl.terms{grid-template-columns:1fr;gap:2px}dl.terms dd{margin-bottom:12px}}
-.downloads{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
-.downloads a{font-size:14px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;text-decoration:none;color:var(--ink)}
-.downloads a:hover{border-color:var(--ink-3)}
-footer{border-top:1px solid var(--line);margin-top:48px;padding:22px 0 40px;color:var(--ink-2);font-size:14px;line-height:1.8}
-footer a{color:inherit}
-.totop{position:fixed;right:16px;bottom:16px;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}
+ul.find{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px}
+ul.find li{border-top:1px solid #fff;padding-top:14px}
+ul.find b{display:block;font-family:var(--display);font-weight:700;font-size:24px;text-transform:uppercase;letter-spacing:.03em;line-height:1.1;margin-bottom:8px}
+ul.find span{color:var(--ink-2)}
+dl.terms{display:grid;grid-template-columns:minmax(160px,240px) 1fr;gap:0;max-width:980px;margin:0}
+dl.terms dt,dl.terms dd{border-top:1px solid var(--line);padding:14px 0;margin:0}
+dl.terms dt{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+dl.terms dd{color:var(--ink-2)}
+@media (max-width:640px){dl.terms{grid-template-columns:1fr}dl.terms dd{border-top:0;padding-top:0}}
+.downloads{display:flex;flex-wrap:wrap;gap:10px;margin:28px 0 0}
+.downloads a{font-family:var(--display);font-weight:600;font-size:13.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid #555;padding:8px 14px;text-decoration:none}
+.downloads a:hover{border-color:#fff}
+footer{border-top:1px solid var(--line);padding:30px 0 48px;color:var(--ink-3);font-size:13.5px;line-height:1.8}
+footer a{color:var(--ink-2)}
+footer .fhead{font-family:var(--display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin:14px 0 2px}
+.totop{position:fixed;right:16px;bottom:16px;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s;background:#000}
 .totop.show{opacity:1;pointer-events:auto}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media print{nav.sections,.totop,.controls button,.chips{display:none}body{background:#fff}.figure{break-inside:avoid}}
+@media print{.topbar,.drawer,.totop,.chips,.controls button{display:none}.panel{min-height:0;height:320px}}
 </style></head><body>
 
-<header class="hero"><div class="wrap">
-  <p class="byline">An analysis by <a href="https://github.com/sahiljangra12">Sahil</a>, using World Bank, UN SDG and Ember data</p>
-  <h1>How the world makes its electricity, and how fast that is changing</h1>
-  <p class="lede">Explore any country's electricity mix from 2000 to 2024, see where renewables have grown, and why national income says less about clean power than you might expect.</p>
-  <div id="hero"></div>
-</div></header>
-
-<nav class="sections" aria-label="Sections"><div class="wrap">
-  <ul>
-    <li><a href="#explorer">Country explorer</a></li>
+<header class="topbar" id="topbar"><div class="wrap">
+  <a class="brand" href="#top">Energy transition<small>Analysis by Sahil</small></a>
+  <ul class="toplinks" id="toplinks">
+    <li><a href="#explorer">Countries</a></li>
     <li><a href="#map-section">World map</a></li>
     <li><a href="#trend">Trend</a></li>
     <li><a href="#income">Income</a></li>
     <li><a href="#movers">Biggest changes</a></li>
     <li><a href="#findings">Findings</a></li>
-    <li><a href="#about">Terms and data</a></li>
+    <li><a href="#about">Data</a></li>
   </ul>
-  <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch colour theme">Dark</button>
-</div></nav>
+  <button class="menubtn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button>
+</div></header>
+<nav class="drawer" id="drawer" aria-label="Sections">
+  <a href="#explorer">Countries</a><a href="#map-section">World map</a><a href="#trend">Trend</a><a href="#income">Income</a>
+  <a href="#movers">Biggest changes</a><a href="#findings">Findings</a><a href="#about">Terms and data</a>
+</nav>
 
-<main class="wrap">
+<section class="panel hero" id="top">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/BlackMarble20161km.jpg/1920px-BlackMarble20161km.jpg"
+       srcset="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/BlackMarble20161km.jpg/960px-BlackMarble20161km.jpg 960w, https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/BlackMarble20161km.jpg/1920px-BlackMarble20161km.jpg 1920w"
+       sizes="100vw" alt="The Earth at night seen from space, with city lights across every continent" fetchpriority="high">
+  <div class="copy"><div class="wrap">
+    <p class="eyebrow">214 countries · 2000 to 2024</p>
+    <h1>How the world makes its electricity</h1>
+    <p class="lead">Explore any country's electricity mix, see where renewables have grown, and why national income says less about clean power than you might expect.</p>
+    <div class="btns"><a class="btn" href="#explorer">Explore a country</a><a class="btn" href="#findings">Read the findings</a></div>
+  </div></div>
+  <p class="credit">Earth at night: <a href="https://commons.wikimedia.org/wiki/File:BlackMarble20161km.jpg">NASA Earth Observatory</a></p>
+</section>
 
-<section id="explorer">
-  <h2>Where does a country's electricity come from?</h2>
-  <p class="how">Pick a country to see how its mix has changed. The left chart shows generation by source each year; click any year on it to update the flow diagram on the right, which shows how each source adds up to the total.</p>
+<div class="content"><div class="wrap">
+  <div class="intro"><h3>The world's mix</h3><p>Every bar is all the electricity generated worldwide in one year, split by source. Coal is still the largest single source; wind and solar are the fastest growing.</p></div>
+  <div id="hero"></div>
+</div></div>
+
+<section class="panel short" id="explorer-photo" aria-labelledby="t-explorer">
+  <img loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Transmission_towers_and_lines_at_sunset_in_East_Texas.jpg/1920px-Transmission_towers_and_lines_at_sunset_in_East_Texas.jpg"
+       srcset="https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Transmission_towers_and_lines_at_sunset_in_East_Texas.jpg/960px-Transmission_towers_and_lines_at_sunset_in_East_Texas.jpg 960w, https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Transmission_towers_and_lines_at_sunset_in_East_Texas.jpg/1920px-Transmission_towers_and_lines_at_sunset_in_East_Texas.jpg 1920w"
+       sizes="100vw" alt="High-voltage transmission towers against a pink sunset">
+  <div class="copy"><div class="wrap">
+    <p class="eyebrow">Country explorer</p>
+    <h2 class="title" id="t-explorer">Where the power comes from</h2>
+    <p class="lead">Pick any of 214 countries to see its electricity by source since 2000, and how each source flows into the total.</p>
+  </div></div>
+  <p class="credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Transmission_towers_and_lines_at_sunset_in_East_Texas.jpg">Matthew T Rader</a>, CC BY-SA 4.0</p>
+</section>
+
+<section class="content" id="explorer"><div class="wrap">
   <div class="controls">
     <label class="field">Country <select id="country"></select></label>
-    <div class="chips" id="chips" aria-label="Quick picks"></div>
-    <button class="iconbtn share" id="shareBtn" type="button">Copy link to this country</button>
+    <button class="ghost share" id="shareBtn" type="button">Copy link</button>
   </div>
+  <div class="chips" id="chips" aria-label="Quick picks"></div>
   <div class="stats" id="ckpis" aria-live="polite"></div>
   <div class="grid2">
     <div class="figure">
-      <div class="head"><h3 id="areaTitle">Electricity generation by source</h3>
+      <div class="head"><h4 id="areaTitle">Electricity generation by source</h4>
         <span class="toggle" role="group" aria-label="Units"><button id="uTwh" aria-pressed="true">TWh</button><button id="uPct" aria-pressed="false">% of total</button></span></div>
-      <div id="area" class="chart" style="height:390px"></div>
+      <div id="area" class="chart" style="height:400px"></div>
     </div>
     <div class="figure">
-      <div class="head"><h3 id="sankeyTitle">Flow of electricity</h3></div>
+      <div class="head"><h4 id="sankeyTitle">Flow of electricity</h4></div>
       <div class="controls yearrow">
         <button class="play" id="mixPlay" type="button" aria-label="Play years">▶ Play</button>
         <input type="range" id="mixYear" aria-label="Year for flow diagram"><span class="val num" id="mixYearLabel"></span>
@@ -174,59 +217,101 @@ footer a{color:inherit}
     </div>
   </div>
   <p class="takeaway" id="countryNote"></p>
-  <p class="src">Data: Ember and Energy Institute, compiled by <a href="https://github.com/owid/energy-data">Our World in Data</a>. Latest year is 2024 for most countries (2023 for some).</p>
+  <p class="src">Click any year on the left chart to move the flow diagram. Data: Ember and Energy Institute, compiled by <a href="https://github.com/owid/energy-data">Our World in Data</a>. Latest year is 2024 for most countries (2023 for some).</p>
+</div></section>
+
+<section class="panel short" aria-labelledby="t-map">
+  <img loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif/lossy-page1-1920px-Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif.jpg"
+       srcset="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif/lossy-page1-960px-Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif.jpg 960w, https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif/lossy-page1-1920px-Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif.jpg 1920w"
+       sizes="100vw" alt="Wind turbines silhouetted against a red sunset in California">
+  <div class="copy"><div class="wrap">
+    <p class="eyebrow">World map</p>
+    <h2 class="title" id="t-map">Renewables around the world</h2>
+    <p class="lead">The share of each country's electricity that came from renewable sources, year by year from 2000 to 2021.</p>
+  </div></div>
+  <p class="credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Wind_turbines_at_sunset,_California_LCCN2011630079.tif">Carol M. Highsmith</a>, public domain</p>
 </section>
 
-<section id="map-section">
-  <h2>Renewable electricity around the world</h2>
-  <p class="how">Each country is shaded by the share of its electricity that came from renewable sources. Press play to watch 2000 to 2021 unfold, or click a country to open it in the explorer.</p>
+<section class="content" id="map-section"><div class="wrap">
   <div class="controls yearrow">
     <button class="play" id="mapPlay" type="button" aria-label="Play years">▶ Play</button>
     <input type="range" id="year" aria-label="Map year"><span class="val num" id="yearLabel"></span>
   </div>
-  <div class="figure"><div id="map" class="chart" style="height:470px"></div></div>
-  <p class="takeaway">Countries with big rivers and hydropower (Brazil, Norway, much of Central and Southern Africa) are darkest. Compare 2000 with 2021 and Germany, the UK and Spain darken as wind and solar grow.</p>
+  <div class="figure"><div id="map" class="chart" style="height:500px"></div></div>
+  <p class="takeaway">Countries with big rivers and hydropower (Brazil, Norway, much of Central and Southern Africa) are brightest. Compare 2000 with 2021 and Germany, the UK and Spain brighten as wind and solar grow. Click a country to open it in the explorer.</p>
+</div></section>
+
+<section class="panel short" aria-labelledby="t-trend">
+  <img loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Broken_Hill_solar_plant_aerial.jpg/1920px-Broken_Hill_solar_plant_aerial.jpg"
+       srcset="https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Broken_Hill_solar_plant_aerial.jpg/960px-Broken_Hill_solar_plant_aerial.jpg 960w, https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Broken_Hill_solar_plant_aerial.jpg/1920px-Broken_Hill_solar_plant_aerial.jpg 1920w"
+       sizes="100vw" alt="Aerial view of a large solar farm in the Australian outback">
+  <div class="copy"><div class="wrap">
+    <p class="eyebrow">Trend, 2000 to 2021</p>
+    <h2 class="title" id="t-trend">Renewable electricity doubled</h2>
+    <div class="stat-line" id="trendStat"></div>
+  </div></div>
+  <p class="credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Broken_Hill_solar_plant_aerial.jpg">Jeremy Buckingham</a>, CC BY 2.0</p>
 </section>
 
-<section id="trend">
-  <h2>Renewable electricity has doubled for the typical country</h2>
-  <p class="how">The renewable share of electricity, 2000 to 2021, measured three ways. The green line follows the same __N_BAL__ countries every year, so it isn't distorted by countries joining the data.</p>
-  <div class="big" id="kpis"></div>
-  <div class="figure"><div id="trendChart" class="chart" style="height:380px"></div></div>
+<section class="content" id="trend"><div class="wrap">
+  <div class="intro"><h3>Three ways to measure it</h3><p>The green line follows the same __N_BAL__ countries every year, so it isn't distorted by countries joining the data. The dotted line weights each country by population, so it shows the share for the average person.</p></div>
+  <div class="stats" id="kpis"></div>
+  <div class="figure"><div id="trendChart" class="chart" style="height:400px"></div></div>
+</div></section>
+
+<section class="panel short" aria-labelledby="t-income">
+  <img loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Itaipu_Aerea.jpg/1920px-Itaipu_Aerea.jpg"
+       srcset="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Itaipu_Aerea.jpg/960px-Itaipu_Aerea.jpg 960w, https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Itaipu_Aerea.jpg/1920px-Itaipu_Aerea.jpg 1920w"
+       sizes="100vw" alt="Aerial view of the Itaipu hydroelectric dam on the Paraná River">
+  <div class="copy"><div class="wrap">
+    <p class="eyebrow">Income</p>
+    <h2 class="title" id="t-income">Are richer countries more renewable?</h2>
+    <p class="lead">It depends on what you count. Geography, like rivers that can be dammed, matters more for clean electricity than wealth does.</p>
+  </div></div>
+  <p class="credit">Itaipu Dam, Brazil and Paraguay. Photo: <a href="https://commons.wikimedia.org/wiki/File:Itaipu_Aerea.jpg">International Hydropower Association</a>, CC BY 2.0</p>
 </section>
 
-<section id="income">
-  <h2>Are richer countries more renewable?</h2>
-  <p class="how">It depends on what you count. Each dot is one country in 2021, placed by income (left to right, log scale) and renewable share (bottom to top). Switch measures to see the pattern change. The country picked in the explorer is circled.</p>
+<section class="content" id="income"><div class="wrap">
+  <div class="intro"><h3>One dot per country, 2021</h3><p>Left to right is income (GDP per person, log scale); bottom to top is the renewable share. Switch measures to see the pattern change. The country picked in the explorer is circled.</p></div>
   <div class="controls">
     <span class="toggle" role="group" aria-label="Measure"><button id="mFinal" aria-pressed="true">Share of all energy use</button><button id="mElec" aria-pressed="false">Share of electricity only</button></span>
   </div>
   <div class="grid2 even">
-    <div class="figure"><div id="scatter" class="chart" style="height:420px"></div></div>
-    <div class="figure"><h3>Median by income quarter</h3><div id="quartiles" class="chart" style="height:380px"></div></div>
+    <div class="figure"><div id="scatter" class="chart" style="height:430px"></div></div>
+    <div class="figure"><h4>Median by income quarter</h4><div id="quartiles" class="chart" style="height:390px"></div></div>
   </div>
   <p class="takeaway" id="scatterNote"></p>
+</div></section>
+
+<section class="panel short" aria-labelledby="t-movers">
+  <img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Power_station_Westfalen._Cooling_towers.jpg"
+       srcset="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Power_station_Westfalen._Cooling_towers.jpg/960px-Power_station_Westfalen._Cooling_towers.jpg 960w, https://upload.wikimedia.org/wikipedia/commons/3/3a/Power_station_Westfalen._Cooling_towers.jpg 1495w"
+       sizes="100vw" alt="Aerial view of cooling towers at the Westfalen power station in Germany">
+  <div class="copy"><div class="wrap">
+    <p class="eyebrow">2011 to 2021</p>
+    <h2 class="title" id="t-movers">Who moved most</h2>
+    <p class="lead">74% of countries raised their renewable share of electricity. Some hydro-reliant countries fell sharply as demand outgrew their dams.</p>
+  </div></div>
+  <p class="credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Power_station_Westfalen._Cooling_towers.jpg">Tim Reckmann</a>, CC BY-SA 3.0</p>
 </section>
 
-<section id="movers">
-  <h2>Who moved most, 2011 to 2021</h2>
-  <p class="how">Change in the renewable share of electricity, in percentage points, for the 10 biggest risers and 10 biggest fallers among __N_CHANGE__ countries with over 1 million people. Click a bar to explore that country.</p>
-  <div class="figure"><div id="moversChart" class="chart" style="height:560px"></div></div>
+<section class="content" id="movers"><div class="wrap">
+  <div class="intro"><h3>The 10 biggest risers and fallers</h3><p>Change in the renewable share of electricity, in percentage points, among __N_CHANGE__ countries with over 1 million people. Click a bar to explore that country.</p></div>
+  <div class="figure"><div id="moversChart" class="chart" style="height:580px"></div></div>
   <p class="takeaway">Rises came from new hydropower (Cambodia), from wind, solar and bioenergy replacing coal (Denmark, the UK), or from small grids where a few new plants shift the share (Liberia, Nicaragua). The biggest falls were in hydro-reliant countries that met growing demand with gas: Ghana's gas generation rose by about 11 TWh while its hydro stayed flat.</p>
-</section>
+</div></section>
 
-<section id="findings">
-  <h2>What this shows</h2>
+<section class="content" id="findings" style="border-top:1px solid var(--line)"><div class="wrap">
+  <div class="intro"><h3>What this shows</h3><p>These are descriptive patterns, not causal effects. Regression models, limitations and the full method are in the <a href="https://github.com/sahiljangra12/energy-transition-analysis/blob/main/docs/report.md">research note</a> and the <a href="https://github.com/sahiljangra12/energy-transition-analysis/blob/main/docs/technical-report/energy_transition_technical_report.pdf">technical report (PDF)</a>.</p></div>
   <ul class="find">
-    <li><div><b>Renewable electricity doubled for the typical country,</b> from 10% to 22% among the 187 countries that reported every year.</div></li>
-    <li><div><b>Most countries moved up.</b> 74% of countries with over 1 million people raised their renewable electricity share between 2011 and 2021, and those that started low gained the most.</div></li>
-    <li><div><b>Income is not the main driver of clean electricity.</b> Geography (rivers for hydropower) and policy matter more. The steep income pattern for all energy mostly reflects poorer households cooking with wood and charcoal.</div></li>
+    <li><b>Renewable electricity doubled</b><span>for the typical country, from 10% to 22% among the 187 countries that reported every year.</span></li>
+    <li><b>Most countries moved up</b><span>74% of countries with over 1 million people raised their renewable electricity share between 2011 and 2021, and those that started low gained the most.</span></li>
+    <li><b>Income isn't the main driver</b><span>Geography (rivers for hydropower) and policy matter more for clean electricity. The steep income pattern for all energy mostly reflects poorer households cooking with wood and charcoal.</span></li>
   </ul>
-  <p class="how" style="margin-top:18px">These are descriptive patterns, not causal effects. Regression models, limitations and the full method are in the <a href="https://github.com/sahiljangra12/energy-transition-analysis/blob/main/docs/report.md">research note</a> and the <a href="https://github.com/sahiljangra12/energy-transition-analysis/blob/main/docs/technical-report/energy_transition_technical_report.pdf">technical report (PDF)</a>.</p>
-</section>
+</div></section>
 
-<section id="about">
-  <h2>Terms and data</h2>
+<section class="content" id="about" style="border-top:1px solid var(--line)"><div class="wrap">
+  <div class="intro"><h3>Terms and data</h3><p>Plain-language definitions of the measures used on this page, and the data behind every chart.</p></div>
   <dl class="terms">
     <dt>TWh</dt><dd>Terawatt-hours: one billion kilowatt-hours. A country of 10 million people in Europe uses roughly 60 TWh of electricity a year.</dd>
     <dt>Renewable share of electricity</dt><dd>Electricity from hydro, wind, solar, bioenergy, geothermal and other renewables, as a percentage of all electricity generated.</dd>
@@ -242,15 +327,17 @@ footer a{color:inherit}
     <a href="https://github.com/sahiljangra12/energy-transition-analysis/blob/main/data/clean/electricity_by_source.csv">Electricity by source (CSV)</a>
     <a href="https://github.com/sahiljangra12/energy-transition-analysis/blob/main/docs/data_dictionary.md">Data dictionary</a>
   </div>
-</section>
-</main>
+</div></section>
 
 <footer><div class="wrap">
-  Sources: <a href="https://data.worldbank.org/indicator/EG.ELC.RNEW.ZS">World Bank EG.ELC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS">EG.FEC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD">NY.GDP.PCAP.CD</a>, <a href="https://unstats.un.org/sdgs/dataportal/database">UN SDG database (7.2.1)</a>, and <a href="https://github.com/owid/energy-data">Our World in Data energy data</a> (Ember, Energy Institute).<br>
-  Code, tests and full method: <a href="https://github.com/sahiljangra12/energy-transition-analysis">github.com/sahiljangra12/energy-transition-analysis</a>
+  <p class="fhead">Data</p>
+  <a href="https://data.worldbank.org/indicator/EG.ELC.RNEW.ZS">World Bank EG.ELC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS">EG.FEC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD">NY.GDP.PCAP.CD</a>, <a href="https://unstats.un.org/sdgs/dataportal/database">UN SDG database (7.2.1)</a>, and <a href="https://github.com/owid/energy-data">Our World in Data energy data</a> (Ember, Energy Institute).
+  <p class="fhead">Photos (Wikimedia Commons)</p>
+  Earth at night: NASA Earth Observatory, public domain · Transmission towers: Matthew T Rader, CC BY-SA 4.0 · Wind turbines: Carol M. Highsmith, public domain · Solar farm: Jeremy Buckingham, CC BY 2.0 · Itaipu Dam: International Hydropower Association, CC BY 2.0 · Westfalen power station: Tim Reckmann, CC BY-SA 3.0
+  <p class="fhead">Code</p>
+  <a href="https://github.com/sahiljangra12/energy-transition-analysis">github.com/sahiljangra12/energy-transition-analysis</a>
 </div></footer>
-<button class="iconbtn totop" id="toTop" type="button" style="background:var(--surface)">Back to top</button>
-
+<button class="ghost totop" id="toTop" type="button">Back to top</button>
 <script>
 const D = __DATA__;
 const SRC = D.sources, MIX = D.mix;
@@ -263,7 +350,7 @@ const T = () => ({ink:css('--ink'), ink2:css('--ink-2'), ink3:css('--ink-3'), gr
   bg:css('--bg'), surface:css('--surface'), accent:css('--accent'), down:css('--down'), elec:css('--elec'), final:css('--final'), line:css('--line')});
 const base = t => ({paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', font:{color:t.ink, family:FONT, size:13},
   hoverlabel:{bgcolor:t.surface, bordercolor:t.line, font:{color:t.ink, family:FONT}}});
-const blues = [[0,'#eef4fc'],[0.25,'#c6dbf5'],[0.5,'#8fb8ea'],[0.75,'#4f8fdc'],[1,'#1d5aa6']];
+const blues = [[0,'#14263b'],[0.25,'#1d4f8c'],[0.5,'#2f7bd6'],[0.75,'#6aa8f0'],[1,'#cfe5ff']];
 const GROUP_COL = {Fossil:'#6b6a66', Renewable:'#1b8a6b', Nuclear:'#8e6cc9'};
 const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`; };
 const pct = (v, t) => t > 0 ? 100 * v / t : 0;
@@ -274,19 +361,16 @@ const ren = s => s.group === 'Renewable', ws = s => s.k === 'wind' || s.k === 's
 function at(c, i){ const v = {}; let t = 0; for (const s of SRC){ const x = c.s[s.k] ? c.s[s.k][i] : 0; v[s.k] = x; t += x; } return {v, t}; }
 function groupShare(c, i, pred){ const {v, t} = at(c, i); return pct(SRC.filter(pred).reduce((a, s) => a + v[s.k], 0), t); }
 
-/* ---------- Theme ---------- */
-const root = document.documentElement;
-function sysDark(){ return window.matchMedia('(prefers-color-scheme: dark)').matches; }
-function isDark(){ const t = root.dataset.theme; return t ? t === 'dark' : sysDark(); }
-function syncThemeBtn(){ $('themeBtn').textContent = isDark() ? 'Light' : 'Dark'; }
-try { const saved = localStorage.getItem('et-theme'); if (saved) root.dataset.theme = saved; } catch (e) {}
-syncThemeBtn();
-$('themeBtn').addEventListener('click', () => {
-  root.dataset.theme = isDark() ? 'light' : 'dark';
-  try { localStorage.setItem('et-theme', root.dataset.theme); } catch (e) {}
-  syncThemeBtn(); redrawAll();
-});
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!root.dataset.theme){ syncThemeBtn(); redrawAll(); } });
+/* ---------- Top bar and menu ---------- */
+const bar = $('topbar'), body = document.body;
+const setMenu = open => { body.classList.toggle('menu-open', open); $('menuBtn').setAttribute('aria-expanded', open);
+  $('menuBtn').setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); };
+$('menuBtn').addEventListener('click', () => setMenu(!body.classList.contains('menu-open')));
+$('drawer').addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+const onScroll = () => { bar.classList.toggle('solid', window.scrollY > 40 || body.classList.contains('menu-open'));
+  $('toTop').classList.toggle('show', window.scrollY > 900); };
+window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
 /* ---------- Hero: world mix spectrum ---------- */
 function drawHero(){
@@ -308,16 +392,14 @@ function drawHero(){
 }
 
 /* ---------- Section nav highlight + back to top ---------- */
-const navLinks = [...document.querySelectorAll('nav.sections a')];
+const navLinks = [...document.querySelectorAll('#toplinks a')];
 const spy = new IntersectionObserver(es => {
   es.forEach(e => { if (e.isIntersecting){
     navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
     const act = navLinks.find(a => a.classList.contains('active'));
-    if (act && narrow()) act.scrollIntoView({block:'nearest', inline:'center'});
   }});
 }, {rootMargin:'-45% 0px -50% 0px'});
-document.querySelectorAll('main section').forEach(s => spy.observe(s));
-window.addEventListener('scroll', () => $('toTop').classList.toggle('show', window.scrollY > 900), {passive:true});
+document.querySelectorAll('section.content[id]').forEach(s => spy.observe(s));
 $('toTop').addEventListener('click', () => window.scrollTo({top:0}));
 
 /* ---------- Year players ---------- */
@@ -344,10 +426,10 @@ $('kpis').innerHTML = D.kpis.map((k, i) => `<div class="stat${i === 0 ? ' ren' :
 const yr = $('year'); yr.min = D.years[0]; yr.max = D.years[D.years.length-1]; yr.value = yr.max;
 function drawMap(){
   const t = T(), y = +yr.value; $('yearLabel').textContent = y;
-  $('map').style.height = narrow() ? '320px' : '470px';
+  $('map').style.height = narrow() ? '320px' : '500px';
   const rows = D.map.filter(r => r.year === y);
   Plotly.react('map', [{type:'choropleth', locations:rows.map(r=>r.iso3), z:rows.map(r=>r.elec), text:rows.map(r=>r.name),
-    zmin:0, zmax:100, colorscale:blues, marker:{line:{color:t.surface, width:0.5}},
+    zmin:0, zmax:100, colorscale:blues, marker:{line:{color:'#000', width:0.5}},
     colorbar: narrow()
       ? {orientation:'h', x:0.5, xanchor:'center', y:-0.02, yanchor:'top', len:0.9, thickness:10,
          title:{text:'Renewable share of electricity', side:'top', font:{size:12, color:t.ink2}},
@@ -357,13 +439,16 @@ function drawMap(){
     hovertemplate:'<b>%{text}</b><br>Renewable electricity in '+y+': %{z:.1f}%<br><i>Click to explore</i><extra></extra>'}],
     {...base(t), margin:{l:0,r:0,t:0,b:narrow()?60:0},
      geo:{projection:{type:'natural earth'}, showframe:false, bgcolor:'rgba(0,0,0,0)', lataxis:{range:[-57,85]},
-      showcoastlines:false, showland:true, landcolor:t.land, showcountries:true, countrycolor:t.surface,
+      showcoastlines:false, showland:true, landcolor:t.land, showcountries:true, countrycolor:'#000',
       showocean:false, showlakes:false}}, cfg);
 }
 const stopMap = player($('mapPlay'), yr, drawMap);
 yr.addEventListener('input', drawMap);
 
 /* ---------- Trend ---------- */
+(() => { const d = D.trend, a = d[0], b = d[d.length - 1];
+  $('trendStat').innerHTML = `<div><b>${a.bal.toFixed(0)}% → ${b.bal.toFixed(0)}%</b><span>Typical country</span></div>` +
+    `<div><b>${a.pop.toFixed(0)}% → ${b.pop.toFixed(0)}%</b><span>Average person</span></div>`; })();
 function drawTrend(){
   const t = T(), d = D.trend, x = d.map(r => r.y);
   const last = d[d.length - 1];
