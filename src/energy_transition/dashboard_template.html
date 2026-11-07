@@ -47,7 +47,8 @@ a{color:var(--ink)}
 /* Full-screen photo panels */
 .panel{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;background:#000}
 .panel.short{min-height:78svh}
-.panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.panel img,.panel video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.panel video{object-position:50% 22%}
 .panel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.25) 45%,rgba(0,0,0,0) 70%),linear-gradient(180deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,0) 26%,rgba(0,0,0,.2) 55%,rgba(0,0,0,.9) 100%)}
 .panel .copy{text-shadow:0 1px 14px rgba(0,0,0,.55)}
 .panel .btn{text-shadow:none}
@@ -223,15 +224,16 @@ footer .fhead{font-family:var(--display);font-weight:600;letter-spacing:.12em;te
 </div></section>
 
 <section class="panel short" aria-labelledby="t-map">
-  <img loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif/lossy-page1-1920px-Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif.jpg"
-       srcset="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif/lossy-page1-960px-Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif.jpg 960w, https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif/lossy-page1-1920px-Wind_turbines_at_sunset%2C_California_LCCN2011630079.tif.jpg 1920w"
-       sizes="100vw" alt="Wind turbines silhouetted against a red sunset in California">
+  <video class="loop" autoplay muted loop playsinline preload="metadata" poster="assets/wind-turbine-poster.jpg"
+         aria-label="A wind turbine turning above autumn trees at dusk">
+    <source src="assets/wind-turbine.mp4" type="video/mp4">
+  </video>
   <div class="copy"><div class="wrap">
     <p class="eyebrow">World map</p>
     <h2 class="title" id="t-map">Renewables around the world</h2>
     <p class="lead">The share of each country's electricity that came from renewable sources, year by year from 2000 to 2021.</p>
   </div></div>
-  <p class="credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:Wind_turbines_at_sunset,_California_LCCN2011630079.tif">Carol M. Highsmith</a>, public domain</p>
+  <p class="credit">Video: Kunal Malik</p>
 </section>
 
 <section class="content" id="map-section"><div class="wrap">
@@ -334,8 +336,9 @@ footer .fhead{font-family:var(--display);font-weight:600;letter-spacing:.12em;te
 <footer><div class="wrap">
   <p class="fhead">Data</p>
   <a href="https://data.worldbank.org/indicator/EG.ELC.RNEW.ZS">World Bank EG.ELC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/EG.FEC.RNEW.ZS">EG.FEC.RNEW.ZS</a>, <a href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD">NY.GDP.PCAP.CD</a>, <a href="https://unstats.un.org/sdgs/dataportal/database">UN SDG database (7.2.1)</a>, and <a href="https://github.com/owid/energy-data">Our World in Data energy data</a> (Ember, Energy Institute).
-  <p class="fhead">Photos (Wikimedia Commons)</p>
-  Earth at night: NASA Earth Observatory, public domain · Transmission towers: Matthew T Rader, CC BY-SA 4.0 · Wind turbines: Carol M. Highsmith, public domain · Solar farm: Jeremy Buckingham, CC BY 2.0 · Itaipu Dam: International Hydropower Association, CC BY 2.0 · Westfalen power station: Tim Reckmann, CC BY-SA 3.0
+  <p class="fhead">Photos and video</p>
+  Wind turbine video: Kunal Malik ·
+  Earth at night: NASA Earth Observatory, public domain · Transmission towers: Matthew T Rader, CC BY-SA 4.0 · Solar farm: Jeremy Buckingham, CC BY 2.0 · Itaipu Dam: International Hydropower Association, CC BY 2.0 · Westfalen power station: Tim Reckmann, CC BY-SA 3.0 (photos via Wikimedia Commons)
   <p class="fhead">Code</p>
   <a href="https://github.com/sahiljangra12/energy-transition-analysis">github.com/sahiljangra12/energy-transition-analysis</a>
 </div></footer>
@@ -362,6 +365,13 @@ const ren = s => s.group === 'Renewable', ws = s => s.k === 'wind' || s.k === 's
 
 function at(c, i){ const v = {}; let t = 0; for (const s of SRC){ const x = c.s[s.k] ? c.s[s.k][i] : 0; v[s.k] = x; t += x; } return {v, t}; }
 function groupShare(c, i, pred){ const {v, t} = at(c, i); return pct(SRC.filter(pred).reduce((a, s) => a + v[s.k], 0), t); }
+
+/* ---------- Background video ---------- */
+document.querySelectorAll('video.loop').forEach(v => {
+  const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const apply = () => { if (rm.matches) { v.pause(); v.removeAttribute('autoplay'); } else { v.play().catch(() => {}); } };
+  apply(); rm.addEventListener('change', apply);
+});
 
 /* ---------- Top bar and menu ---------- */
 const bar = $('topbar'), body = document.body;
