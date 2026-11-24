@@ -146,6 +146,9 @@ footer .fhead{font-family:var(--display);font-weight:600;letter-spacing:.12em;te
 .totop{position:fixed;right:16px;bottom:16px;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s;background:#000}
 .totop.show{opacity:1;pointer-events:auto}
 @media print{.topbar,.drawer,.totop,.chips,.controls button{display:none}.panel{min-height:0;height:320px}}
+
+/* Phones: finger-sized buttons and readable credits */
+@media (max-width:640px){.chips button,.toggle button,.play,.ghost{min-height:44px}.downloads a{display:inline-flex;align-items:center;min-height:44px}.yearrow input[type=range]{min-height:36px}.credit,.brand small{font-size:12px}footer a{display:inline-block;padding:10px 0}}
 </style></head><body>
 
 <header class="topbar" id="topbar"><div class="wrap">
