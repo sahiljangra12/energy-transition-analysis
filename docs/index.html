@@ -660,5 +660,5 @@ $('moversChart').on('plotly_click', e => { const p = e.points && e.points[0]; if
 $('scatter').on('plotly_click', e => { const p = e.points && e.points[0]; if (p && p.customdata) selectCountry(p.customdata, true); });
 $('area').on('plotly_click', e => { const p = e.points && e.points[0]; if (p){ stopMix(); my.value = p.x; const c = MIX.c[csel.value]; drawSankey(c); drawArea(c); } });
 let rw; window.addEventListener('resize', () => { clearTimeout(rw); rw = setTimeout(() => { drawHero(); drawMap(); drawTrend(); drawMovers(); }, 200); });
-</script><script defer src="https://sahiljangra12.github.io/ask/ask.js" data-site="Energy Transition Explorer"></script>
+</script><script defer src="https://sahiljangra12.github.io/ask/ask.js" data-site="Energy Transition Explorer" data-claude="on"></script>
 </body></html>
